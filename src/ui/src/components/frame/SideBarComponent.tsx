@@ -13,17 +13,7 @@ const Sidebar = () => {
     const handleSideBarNavigation = (path: string) => {
         nav(path);
     }
-
-    const loadCalendars = async () => {
-        window.electron.getCalendars().then(data => {
-            setCalendars(data)
-        })
-    }
-
-    useEffect(() => {
-        loadCalendars();
-    })
-
+    
     return (
         <div className={`sidebar`}>
             {/*<div className="sidebar-logo">{isExpanded ? (theme === 'dark' ? 'MyApp (Dark)' : 'MyApp (Light)') : (

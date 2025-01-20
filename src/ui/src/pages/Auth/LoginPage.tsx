@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
         e.preventDefault();
         setLoadingStatus(true);
 
-        const response = await window.electron.checkCredentials(email, password, host.given != "" ? host.given : host.default);
+        const response = await window.electron.imapCheckCredentials(email, password, host.given != "" ? host.given : host.default);
         switch (response.status) {
             case "success":
                 addNotification("Welcome back", "success");

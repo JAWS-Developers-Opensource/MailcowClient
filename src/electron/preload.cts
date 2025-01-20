@@ -2,12 +2,13 @@ const { contextBridge, ipcRenderer } = require('electron');
 //const { imapLogin } = require("./imap");
 
 contextBridge.exposeInMainWorld('electron', {
-  checkCredentials: (email, password, host) => ipcInvoke("checkCredentials", { email, password, host }),
+  imapCheckCredentials: (email, password, host) => ipcInvoke("imapCheckCredentials", { email, password, host }),
   saveUserCredentials: (userCredentials) => ipcSend("saveUserCredentials", userCredentials),
   getUserCredentials: () => ipcInvoke("getUserCredentials"),
   removeUserCredentials: () => ipcInvoke("removeUserCredentials"),
-  createConn: () => ipcInvoke("createConn"),
-  getCalendars: () => ipcInvoke("getCalendars")
+  calCreateConn: () => ipcInvoke("calCreateConn"),
+  calGetCalendars: () => ipcInvoke("calGetCalendars"),
+  calQueryCalendar: (calendar, month, year) => ipcInvoke("calQueryCalendar", { calendar, month, year })
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

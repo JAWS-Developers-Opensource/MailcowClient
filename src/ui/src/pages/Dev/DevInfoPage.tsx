@@ -3,10 +3,7 @@ import './DevInfoPage.css';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const DevInfoPage = () => {
-    const { theme } = useTheme();
-
-    console.log(theme);
-    
+    const { theme } = useTheme();    
 
     return (
         <div className="dev-info-container">

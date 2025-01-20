@@ -1,0 +1,12 @@
+.cal-sidebar-container {
+    padding: 20px
+}
+
+.calendar-item {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+}

@@ -24,21 +24,23 @@ type Calendar = {
 }
 
 type EventPayloadMapping = {
-    checkCredentials: ImapLogin,
+    imapCheckCredentials: ImapLogin,
     saveUserCredentials: UserCredentials,
     getUserCredentials:  UserCredentials
     removeUserCredentials: void,
-    createConn: any,
-    getCalendars: any,
+    calCreateConn: any,
+    calGetCalendars: DAVCalendar[],
+    calQueryCalendar: DAVResponse[]
 }
 
 interface Window {
     electron: {
-        checkCredentials: (email: string, password: string, host: string) => Promise<ImapLogin>,
+        imapCheckCredentials: (email: string, password: string, host: string) => Promise<ImapLogin>,
         saveUserCredentials: (userCredentials: UserCredentials) => void,
         getUserCredentials: () => Promise<UserCredentials> 
         removeUserCredentials: () => Promise<void>,
-        createConn: () => Promise<any>,
-        getCalendars: () => Promise<Calendar[]>
+        calCreateConn: () => Promise<any>,
+        calGetCalendars: () => Promise<DAVCalendar[]>,
+        calQueryCalendar: (calendar: DAVCalendar, month: number, year: number) => Promise<DAVResponse[]>
     }
 }

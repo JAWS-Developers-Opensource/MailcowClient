@@ -8,7 +8,6 @@
 .frame-content {
     margin-left: 80px;
     /* Si adatta alla larghezza della sidebar */
-    padding: 20px;
     width: 100%;
     transition: margin-left 0.3s ease;
     background-color: var(--background-color);

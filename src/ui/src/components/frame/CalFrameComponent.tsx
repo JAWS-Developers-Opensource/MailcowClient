@@ -5,9 +5,9 @@ import { CalSideBarComponent } from '../cal/CalSideBarComponent';
 
 const CalFrameComponent = ({ children }: { children: React.ReactNode}) => {
     return (
-        <div className="frame">
+        <div className="cal-frame">
             <CalSideBarComponent />
-            <div className="frame-content">{children}</div>
+            <div className="cal-frame-content">{children}</div>
         </div>
     );
 };

@@ -1,20 +1,11 @@
-// Notification System with Context and TypeScript for React Vite
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import './NotificationContext.css';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { NotificationContextProps } from '../types/notification.types';
 
-interface Notification {
-    id: number;
-    message: string;
-    type: 'info' | 'success' | 'error';
-}
+// Context for notifications
+const NotificationContext = createContext<NotificationContextProps | undefined>(undefined);
 
-interface NotificationContextType {
-    addNotification: (message: string, type: 'info' | 'success' | 'error') => void;
-}
-
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
-
-export const useNotification = (): NotificationContextType => {
+export const useNotification = () => {
     const context = useContext(NotificationContext);
     if (!context) {
         throw new Error('useNotification must be used within a NotificationProvider');
@@ -22,55 +13,100 @@ export const useNotification = (): NotificationContextType => {
     return context;
 };
 
+// Notification Provider
 interface NotificationProviderProps {
     children: ReactNode;
 }
 
-export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+const NotificationProvider = ({ children }: NotificationProviderProps) => {
+    const [notifications, setNotifications] = useState<{ id: number; title: string; message: string; type: string }[]>([]);
 
-    const addNotification = (message: string, type: 'info' | 'success' | 'error') => {
+    const addNotification = (title: string, message: string, type: 'success' | 'error' | 'info') => {
         const id = Date.now();
-        setNotifications((prev) => [...prev, { id, message, type }]);
-    };
+        setNotifications((prev) => [...prev, { id, title, message, type }]);
 
-    const removeNotification = (id: number) => {
-        setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+        // Auto-remove after 4 seconds
+        setTimeout(() => {
+            setNotifications((prev) => prev.filter((notification) => notification.id !== id));
+        }, 4000);
     };
 
     return (
         <NotificationContext.Provider value={{ addNotification }}>
             {children}
-            <div className="notification-container">
-                {notifications.map(({ id, message, type }) => (
-                    <Notification
-                        key={id}
-                        message={message}
-                        type={type}
-                        onClose={() => removeNotification(id)}
-                    />
+            <StyledNotificationContainer>
+                {notifications.map((notification) => (
+                    <StyledNotification key={notification.id} type={notification.type}>
+                        <NotificationTitle>{notification.title}</NotificationTitle>
+                        <NotificationMessage>{notification.message}</NotificationMessage>
+                    </StyledNotification>
                 ))}
-            </div>
+            </StyledNotificationContainer>
         </NotificationContext.Provider>
     );
 };
 
-interface NotificationProps {
-    message: string;
-    type: 'info' | 'success' | 'error';
-    onClose: () => void;
-}
+// Animations
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+        transform: translateY(10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`;
 
-const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) => {  
-    useEffect(() => {
-        const timer = setTimeout(onClose, 3000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
+const fadeOut = keyframes`
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+`;
 
-    return (
-        <div className={`notification ${type}`} onClick={onClose}>
-            <span>{message}</span>
-            <button className="close">&times;</button>
-        </div>
-    );
-};
+// Styled components
+const StyledNotificationContainer = styled.div`
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 1000;
+`;
+
+const StyledNotification = styled.div<{ type: string }>`
+    background-color: ${({ type }) =>
+        type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: ${fadeIn} 0.3s ease-out, ${fadeOut} 0.3s ease-in 3.7s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+`;
+
+const NotificationTitle = styled.h4`
+    font-size: 1.2rem;
+    margin: 0;
+`;
+
+const NotificationMessage = styled.p`
+    font-size: 1rem;
+    margin: 0;
+`;
+
+export default NotificationProvider;

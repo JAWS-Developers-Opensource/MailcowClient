@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const loginF = async () => {
         setLoadingStatus(true);
         window.electron.getUserCredentials().then(async (userCredentials) => {
-            const response = await window.electron.checkCredentials(userCredentials.email, userCredentials.password, userCredentials.host);
+            const response = await window.electron.imapCheckCredentials(userCredentials.email, userCredentials.password, userCredentials.host);
             switch (response.status) {
                 case "success":
                     addNotification("Welcome back", "success");
