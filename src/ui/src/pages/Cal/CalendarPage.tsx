@@ -8,6 +8,7 @@ import EventPopup from '../../components/cal/NewEventComponent';
 import EventHoverTooltip from '../../components/cal/EventHoverTooltip';
 import ICAL from 'ical.js';
 import { DAVCalendar } from 'tsdav';
+import { useLoading } from '../../contexts/LoadingContext';
 
 const localizer = momentLocalizer(moment);
 
@@ -18,31 +19,33 @@ moment.locale("it-it", {
 });
 
 const CalendarPage = () => {
+    const { setLoadingStatus, loading } = useLoading();
+
     const [events, setEvents] = useState<any[]>([]);
     const [cals, setCals] = useState<DAVCalendar[]>();
+    const [calEvents, setCalEvents] = useState<Map<DAVCalendar, {title: string, start: Date, end: Date, allDay: boolean, description: string, color: string}[]>>()
     const calendarColors: Record<string, string> = {};
 
     const loadEvents = async () => {
+        setLoadingStatus(true);
         setEvents([]); // Reset degli eventi
         await window.electron.calCreateConn();
 
         const assignColorsToCalendars = (calendars: DAVCalendar[]) => {
-            // Assegna un colore unico a ogni calendario
-            const colors = ['#FF5733', '#33FF57', '#3357FF', '#FFC300', '#DAF7A6'];
-            //console.log(calendars);
-            
+
             calendars.forEach((cal, index) => {
-                calendarColors[cal.displayName + ""] = colors[index % colors.length];
+                calendarColors[cal.displayName + ""] = cal.calendarColor + "";
             });
         };
 
         window.electron.calGetCalendars().then((cals) => {
+
             setCals(cals);
             assignColorsToCalendars(cals);
 
             const allEvents: any[] = [];
 
-            cals.forEach((cal) => {                
+            cals.forEach((cal) => {
                 window.electron.calQueryCalendar(cal, 1, 2025).then((icsEvents) => {
                     icsEvents.forEach((entry) => {
                         try {
@@ -52,13 +55,14 @@ const CalendarPage = () => {
 
                             vevents.forEach((vevent) => {
                                 const event = new ICAL.Event(vevent);
+
                                 const calendarEvent = {
                                     title: event.summary || 'Senza titolo',
                                     start: event.startDate.toJSDate(),
                                     end: event.endDate.toJSDate(),
                                     allDay: event.startDate.isDate,
                                     description: event.description || '',
-                                    color: calendarColors[cal.displayName] || '#808080', // Colore del calendario
+                                    color: calendarColors[cal.displayName] || '#808080',
                                 };
 
                                 allEvents.push(calendarEvent);
@@ -68,16 +72,21 @@ const CalendarPage = () => {
                         }
                     });
 
-                    setEvents((prevEvents) => [...prevEvents, ...allEvents]);
                 });
             });
+            setEvents(allEvents);
+            setLoadingStatus(false)
+
         });
     };
 
     useEffect(() => {
         loadEvents();
     }, [])
-    
+
+    if (loading)
+        return <></>;
+
 
     const eventStyleGetter = (event: any) => {
         return {
