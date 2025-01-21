@@ -4,11 +4,11 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './CalendarPage.css';
-import EventPopup from '../../components/cal/NewEventComponent';
-import EventHoverTooltip from '../../components/cal/EventHoverTooltip';
 import ICAL from 'ical.js';
 import { DAVCalendar } from 'tsdav';
 import { useLoading } from '../../contexts/LoadingContext';
+import { ReactEventType } from '../../types/calendar.types';
+import { useVars } from '../../contexts/VarContext';
 
 const localizer = momentLocalizer(moment);
 
@@ -18,17 +18,17 @@ moment.locale("it-it", {
     }
 });
 
-const CalendarPage = () => {
+const CalendarPage: React.FC = ({ }) => {
     const { setLoadingStatus, loading } = useLoading();
+    const { getVar, cal } = useVars();
 
     const [events, setEvents] = useState<any[]>([]);
     const [cals, setCals] = useState<DAVCalendar[]>();
-    const [calEvents, setCalEvents] = useState<Map<DAVCalendar, {title: string, start: Date, end: Date, allDay: boolean, description: string, color: string}[]>>()
+    const [calEvents, setCalEvents] = useState<{ clendar: DAVCalendar, events: ReactEventType[] }[]>([])
     const calendarColors: Record<string, string> = {};
 
     const loadEvents = async () => {
-        setLoadingStatus(true);
-        setEvents([]); // Reset degli eventi
+        setEvents([]);
         await window.electron.calCreateConn();
 
         const assignColorsToCalendars = (calendars: DAVCalendar[]) => {
@@ -38,15 +38,14 @@ const CalendarPage = () => {
             });
         };
 
-        window.electron.calGetCalendars().then((cals) => {
+        await window.electron.calGetCalendars().then((cals) => {
 
             setCals(cals);
             assignColorsToCalendars(cals);
 
-            const allEvents: any[] = [];
-
-            cals.forEach((cal) => {
-                window.electron.calQueryCalendar(cal, 1, 2025).then((icsEvents) => {
+            cals.forEach(async (cal: DAVCalendar) => {
+                const callEvents: ReactEventType[] = [];
+                await window.electron.calQueryCalendar(cal, 1, 2025).then((icsEvents) => {
                     icsEvents.forEach((entry) => {
                         try {
                             const parsedData = ICAL.parse(entry.data);
@@ -62,31 +61,38 @@ const CalendarPage = () => {
                                     end: event.endDate.toJSDate(),
                                     allDay: event.startDate.isDate,
                                     description: event.description || '',
-                                    color: calendarColors[cal.displayName] || '#808080',
+                                    color: calendarColors[cal.displayName + ""] || '#808080',
                                 };
 
-                                allEvents.push(calendarEvent);
+                                callEvents.push(calendarEvent);
                             });
                         } catch (error) {
                             console.error('Errore nel parsare i dati:', error);
                         }
                     });
-
                 });
+                setCalEvents(prev => [...prev, { clendar: cal, events: callEvents}])
             });
-            setEvents(allEvents);
-            setLoadingStatus(false)
-
         });
+        setLoadingStatus(false)
     };
 
     useEffect(() => {
+        setLoadingStatus(true)
         loadEvents();
     }, [])
 
-    if (loading)
-        return <></>;
 
+    useEffect(() => {
+        // Unisci tutti gli eventi visibili in un unico array
+        const visibleCals = getVar("cal", "visibility");
+
+        const allVisibleEvents = calEvents
+            .filter(cal => visibleCals[cal.clendar.ctag + ""]) // Filtra solo i calendari visibili
+            .flatMap(cal => cal.events); // Unisci gli eventi
+
+        setEvents(allVisibleEvents); // Aggiorna lo stato degli eventi
+    }, [calEvents, cal]);
 
     const eventStyleGetter = (event: any) => {
         return {
@@ -101,6 +107,11 @@ const CalendarPage = () => {
         };
     };
 
+    if (loading)
+        return <></>;
+
+    console.log("render");
+
     return (
         <div className="calendar-container">
             <Calendar
@@ -112,7 +123,6 @@ const CalendarPage = () => {
                 style={{ margin: '20px' }}
                 eventPropGetter={eventStyleGetter} // Applica lo stile dinamico
             />
-
         </div>
     );
 };

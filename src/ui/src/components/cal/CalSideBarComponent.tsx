@@ -2,10 +2,12 @@ import { Key, useEffect, useState } from "react"
 import "./CalSideBarComponent.css"
 import { useLoading } from "../../contexts/LoadingContext";
 import { DAVCalendar } from "tsdav";
+import { useVars } from "../../contexts/VarContext";
 
 
 export const CalSideBarComponent = () => {
-    const { setLoadingStatus } = useLoading();
+    const { setLoadingStatus, loading } = useLoading();
+    const { setVar } = useVars();
 
     const [calendars, setCalendars] = useState<DAVCalendar[]>([]);
     const [visibility, setVisibility] = useState<Record<number, boolean>>([]);
@@ -20,6 +22,7 @@ export const CalSideBarComponent = () => {
                 return acc;
             }, {});
             setVisibility(initialVisibility);
+            setVar("cal", "visibility", initialVisibility)
             setLoadingStatus(false)
         });
     };
@@ -31,6 +34,8 @@ export const CalSideBarComponent = () => {
             ...prevVisibility,
             [id]: !prevVisibility[id],
         }));
+
+        setVar("cal", "visibility", visibility)
     };
 
     useEffect(() => {
@@ -43,7 +48,7 @@ export const CalSideBarComponent = () => {
             <ul className="calendar-list">
                 {calendars.map((calendar) => (
                     <li key={calendar.ctag} className="calendar-item">
-                        <label className="calendar-label" style={{color: calendar.calendarColor}}>
+                        <label className="calendar-label" style={{ color: calendar.calendarColor }}>
                             {calendar.displayName + ""}
                         </label>
                         <input

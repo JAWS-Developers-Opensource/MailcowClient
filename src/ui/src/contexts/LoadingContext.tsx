@@ -23,7 +23,7 @@ interface LoadingProviderProps {
 }
 
 const LoadingProvider = ({ children }: LoadingProviderProps) => {
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     // `useCallback` per evitare la ricreazione della funzione ad ogni render
     const setLoadingStatus = useCallback((status: boolean) => {
