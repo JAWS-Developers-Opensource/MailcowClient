@@ -3,6 +3,7 @@ import "./CalSideBarComponent.css"
 import { useLoading } from "../../contexts/LoadingContext";
 import { DAVCalendar } from "tsdav";
 import { useVars } from "../../contexts/VarContext";
+import { FaPlus } from "react-icons/fa";
 
 
 export const CalSideBarComponent = () => {
@@ -34,17 +35,20 @@ export const CalSideBarComponent = () => {
             ...prevVisibility,
             [id]: !prevVisibility[id],
         }));
-
-        setVar("cal", "visibility", visibility)
     };
 
     useEffect(() => {
         loadCal();
     }, []);
 
+    useEffect(() => {
+        setVar("cal", "visibility", visibility)
+    }, [visibility])
+
     return (
         <div className="cal-sidebar-container">
             <h2 className="sidebar-title">Calendari</h2>
+            <button className="add-event-button"><FaPlus /></button>
             <ul className="calendar-list">
                 {calendars.map((calendar) => (
                     <li key={calendar.ctag} className="calendar-item">

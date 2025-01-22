@@ -9,4 +9,19 @@
     width: 100%;
     justify-content: space-between;
     padding: 10px;
+    padding-left: 0px;
+}
+
+.add-event-button {
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 0px;
+    background-color: rgb(0, 187, 0);
+    border-radius: 10px;
+}
+
+.add-event-button:hover {
+    cursor: pointer;
 }

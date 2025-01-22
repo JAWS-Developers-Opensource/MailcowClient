@@ -84,14 +84,17 @@ const CalendarPage: React.FC = ({ }) => {
 
 
     useEffect(() => {
-        // Unisci tutti gli eventi visibili in un unico array
         const visibleCals = getVar("cal", "visibility");
+        console.log(visibleCals);
+        console.log(cal);
+        
+        
 
         const allVisibleEvents = calEvents
-            .filter(cal => visibleCals[cal.clendar.ctag + ""]) // Filtra solo i calendari visibili
-            .flatMap(cal => cal.events); // Unisci gli eventi
+            .filter(cal => visibleCals[cal.clendar.ctag + ""]) 
+            .flatMap(cal => cal.events);
 
-        setEvents(allVisibleEvents); // Aggiorna lo stato degli eventi
+        setEvents(allVisibleEvents);
     }, [calEvents, cal]);
 
     const eventStyleGetter = (event: any) => {
