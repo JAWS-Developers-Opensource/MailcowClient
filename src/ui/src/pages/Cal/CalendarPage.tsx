@@ -21,12 +21,10 @@ moment.locale("it-it", {
 
 const CalendarPage: React.FC = ({ }) => {
     const { setLoadingStatus, loading } = useLoading();
-    const { getVar, cal } = useVars();
-    const { calendars } = useCalContext();
+    const { calendars, updateTriggers } = useCalContext();
 
     const [events, setEvents] = useState<any[]>([]);
-    const [cals, setCals] = useState<DAVCalendar[]>();
-    const [calEvents, setCalEvents] = useState<{ clendar: DAVCalendar, events: ReactEventType[] }[]>([])
+    const [calEvents, setCalEvents] = useState<{ calendar: DAVCalendar, events: ReactEventType[] }[]>([])
     const calendarColors: Record<string, string> = {};
 
     const loadEvents = async () => {
@@ -41,8 +39,6 @@ const CalendarPage: React.FC = ({ }) => {
         };
 
         await window.electron.calGetCalendars().then((cals) => {
-
-            setCals(cals);
             assignColorsToCalendars(cals);
 
             cals.forEach(async (cal: DAVCalendar) => {
@@ -73,7 +69,7 @@ const CalendarPage: React.FC = ({ }) => {
                         }
                     });
                 });
-                setCalEvents(prev => [...prev, { clendar: cal, events: callEvents }])
+                setCalEvents(prev => [...prev, { calendar: cal, events: callEvents }])
             });
         });
         setLoadingStatus(false)
@@ -84,14 +80,18 @@ const CalendarPage: React.FC = ({ }) => {
         loadEvents();
     }, [])
 
-
     useEffect(() => {
+        console.log("updated");
+
         const allVisibleEvents = calEvents
-            .filter(cal => calendars.getCalendarVisiblity(cal.clendar))
+            .filter(({ calendar }) => calendars.getCalendarVisiblity(calendar))
             .flatMap(cal => cal.events);
 
+        console.log(allVisibleEvents);
+
+
         setEvents(allVisibleEvents);
-    }, [calendars, cal]);
+    }, [calendars]);
 
     const eventStyleGetter = (event: any) => {
         return {
@@ -108,8 +108,6 @@ const CalendarPage: React.FC = ({ }) => {
 
     if (loading)
         return <></>;
-
-    console.log("render");
 
     return (
         <div className="calendar-container">
