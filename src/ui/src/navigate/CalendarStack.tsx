@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom"
 import CalendarPage from "../pages/Cal/CalendarPage"
 import CalFrameComponent from "../components/frame/CalFrameComponent"
 import { useLoading } from "../contexts/LoadingContext";
+import { CalProvider } from "../contexts/cal/CalContext";
 
 export const CalendarStack = () => {
 
@@ -23,10 +24,12 @@ export const CalendarStack = () => {
 
 
     return (
-        <CalFrameComponent>
-            <Routes>
-                <Route path="*" element={<CalendarPage />} />
-            </Routes>
-        </CalFrameComponent>
+        <CalProvider>
+            <CalFrameComponent>
+                <Routes>
+                    <Route path="*" element={<CalendarPage />} />
+                </Routes>
+            </CalFrameComponent>
+        </CalProvider>
     )
 }

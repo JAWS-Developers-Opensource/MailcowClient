@@ -5,16 +5,14 @@ import { DAVCalendar } from "tsdav";
 type PopupContextType = {
     popUps: {
         addEvent: {
-            isPopupOpen: boolean;
-            openPopup: () => void;
-            closePopup: () => void;
+            isPopupOpen: boolean
+            popUpState: (status: "open" | "closed") => void;
         }
-    }
+    },
     calendars: {
-        setCalendars: () => void;
-        setCalendarsVisiblity: () => void;
-        getCalendars: () => DAVCalendar[];
-        getCalendarsVisiblity: () => {calendar: }
+        setCalendars: (calendars: DAVCalendar[]) => void;
+        getCalendars: () => { calendar: DAVCalendar, visibility: boolean }[];
+        getCalendarVisiblity: (calendar: DAVCalendar) => boolean
     }
 }
 
@@ -22,18 +20,46 @@ const PopupContext = createContext<PopupContextType | undefined>(undefined);
 
 export const CalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isPopupOpen, setPopupOpen] = useState(false);
+    const popUpProps = {
+        addEvent: {
+            isPopupOpen: isPopupOpen,
+            popUpState: (status: "open" | "closed") => setPopupOpen(status === "open" ? true : false),
+        }
+    }
 
-    const openPopup = () => setPopupOpen(true);
-    const closePopup = () => setPopupOpen(false);
+    const [calendars, setCalendars] = useState<{ calendar: DAVCalendar, visibility: boolean }[]>([]);
+    const saveCalendars = (calendars: DAVCalendar[]) => {
+        const updatedCalendars = calendars.map(calendar => ({
+            calendar,
+            visibility: true,
+        }));
+        setCalendars(updatedCalendars)
+    }
+
+    const calendarsProps = {
+        setCalendars: saveCalendars,
+        setCalendarVisibility: (calendar: DAVCalendar) => {
+            setCalendars(prevCalendars => 
+            prevCalendars.map(item => 
+                item.calendar === calendar 
+                    ? { ...item, visibility: !item.visibility } 
+                    : item
+            )
+        )},
+        getCalendars: () => calendars,
+        getCalendarVisiblity: (calendar: DAVCalendar) => calendars.filter(cal => cal.calendar === calendar)[0].visibility
+    }
+
+
 
     return (
-        <PopupContext.Provider value={{ isPopupOpen, openPopup, closePopup }}>
+        <PopupContext.Provider value={{ popUps: popUpProps, calendars: calendarsProps }}>
             {children}
         </PopupContext.Provider>
     );
 };
 
-export const usePopup = () => {
+export const useCalContext = () => {
     const context = useContext(PopupContext);
     if (!context) {
         throw new Error("usePopup must be used within a PopupProvider");

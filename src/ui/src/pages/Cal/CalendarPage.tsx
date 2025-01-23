@@ -9,6 +9,7 @@ import { DAVCalendar } from 'tsdav';
 import { useLoading } from '../../contexts/LoadingContext';
 import { ReactEventType } from '../../types/calendar.types';
 import { useVars } from '../../contexts/VarContext';
+import { useCalContext } from '../../contexts/cal/CalContext';
 
 const localizer = momentLocalizer(moment);
 
@@ -21,6 +22,7 @@ moment.locale("it-it", {
 const CalendarPage: React.FC = ({ }) => {
     const { setLoadingStatus, loading } = useLoading();
     const { getVar, cal } = useVars();
+    const { calendars } = useCalContext();
 
     const [events, setEvents] = useState<any[]>([]);
     const [cals, setCals] = useState<DAVCalendar[]>();
@@ -71,7 +73,7 @@ const CalendarPage: React.FC = ({ }) => {
                         }
                     });
                 });
-                setCalEvents(prev => [...prev, { clendar: cal, events: callEvents}])
+                setCalEvents(prev => [...prev, { clendar: cal, events: callEvents }])
             });
         });
         setLoadingStatus(false)
@@ -84,18 +86,12 @@ const CalendarPage: React.FC = ({ }) => {
 
 
     useEffect(() => {
-        const visibleCals = getVar("cal", "visibility");
-        console.log(visibleCals);
-        console.log(cal);
-        
-        
-
         const allVisibleEvents = calEvents
-            .filter(cal => visibleCals[cal.clendar.ctag + ""]) 
+            .filter(cal => calendars.getCalendarVisiblity(cal.clendar))
             .flatMap(cal => cal.events);
 
         setEvents(allVisibleEvents);
-    }, [calEvents, cal]);
+    }, [calendars, cal]);
 
     const eventStyleGetter = (event: any) => {
         return {
