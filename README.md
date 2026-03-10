@@ -3,7 +3,7 @@
 
 A desktop email / calendar / contacts client for [Mailcow](https://mailcow.email) servers, built with Electron + React + TypeScript.
 ***BY HERE I SAY THAT THE MOST CREDIT GOESE TO MAILCOW. WIHTOUT A SERVER WE COULDN'T HAVE ANY CLIENT***
-
+***JAWS Developers is neither affiliated nor partnered at this time, and the code is not considered ready for end-user use. There will be no builds until it is safe to use!!!***
 ## Quick start (development)
 
 ```bash
