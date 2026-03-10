@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './ComposeEmailComponent.css';
 import { useNotification } from '../../contexts/NotificationContext';
-import { useAuth } from '../../contexts/AuthContext';
 
 interface ComposeEmailProps {
     onClose: () => void;

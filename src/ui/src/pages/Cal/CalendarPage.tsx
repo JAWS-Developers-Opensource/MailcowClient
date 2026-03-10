@@ -34,7 +34,7 @@ type RichEvent = ReactEventType & {
 
 const CalendarPage: React.FC = () => {
     const { setLoadingStatus, loading } = useLoading();
-    const { calendars, popUps } = useCalContext();
+    const { calendars } = useCalContext();
     const { addNotification } = useNotification();
 
     const [events, setEvents] = useState<RichEvent[]>([]);
@@ -46,7 +46,6 @@ const CalendarPage: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingObject, setEditingObject] = useState<DAVCalendarObject | null>(null);
-    const [editingCalIndex, setEditingCalIndex] = useState(0);
     const [newEvent, setNewEvent] = useState({ ...EMPTY_EVENT });
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -56,47 +55,52 @@ const CalendarPage: React.FC = () => {
         setLoadingStatus(true);
         setCalEvents([]);
 
-        await window.electron.calCreateConn();
-        const cals = await window.electron.calGetCalendars();
-        setAllCalendars(cals);
-        calendars.setCalendars(cals);
+        try {
+            await window.electron.calCreateConn();
+            const cals = await window.electron.calGetCalendars();
+            setAllCalendars(cals);
+            calendars.setCalendars(cals);
 
-        const calendarColors: Record<string, string> = {};
-        cals.forEach((cal) => { calendarColors[String(cal.displayName)] = String(cal.calendarColor); });
+            const calendarColors: Record<string, string> = {};
+            cals.forEach((cal) => { calendarColors[String(cal.displayName)] = String(cal.calendarColor); });
 
-        const all: { calendar: DAVCalendar; events: RichEvent[] }[] = [];
+            const all: { calendar: DAVCalendar; events: RichEvent[] }[] = [];
 
-        for (const cal of cals) {
-            const callEvents: RichEvent[] = [];
-            try {
-                const icsEvents = await window.electron.calQueryCalendar(cal, d.getMonth(), d.getFullYear());
-                icsEvents.forEach((entry: any) => {
-                    try {
-                        const parsedData = ICAL.parse(entry.data);
-                        const comp = new ICAL.Component(parsedData);
-                        const vevents = comp.getAllSubcomponents('vevent');
-                        vevents.forEach((vevent: any) => {
-                            const event = new ICAL.Event(vevent);
-                            callEvents.push({
-                                title: event.summary || 'Untitled',
-                                start: event.startDate.toJSDate(),
-                                end: event.endDate.toJSDate(),
-                                allDay: event.startDate.isDate,
-                                description: event.description || '',
-                                color: calendarColors[String(cal.displayName)] || '#808080',
-                                calendarObject: entry,
-                                calendarIndex: cals.indexOf(cal),
+            for (const cal of cals) {
+                const callEvents: RichEvent[] = [];
+                try {
+                    const icsEvents = await window.electron.calQueryCalendar(cal, d.getMonth(), d.getFullYear());
+                    icsEvents.forEach((entry: any) => {
+                        try {
+                            const parsedData = ICAL.parse(entry.data);
+                            const comp = new ICAL.Component(parsedData);
+                            const vevents = comp.getAllSubcomponents('vevent');
+                            vevents.forEach((vevent: any) => {
+                                const event = new ICAL.Event(vevent);
+                                callEvents.push({
+                                    title: event.summary || 'Untitled',
+                                    start: event.startDate.toJSDate(),
+                                    end: event.endDate.toJSDate(),
+                                    allDay: event.startDate.isDate,
+                                    description: event.description || '',
+                                    color: calendarColors[String(cal.displayName)] || '#808080',
+                                    calendarObject: entry,
+                                    calendarIndex: cals.indexOf(cal),
+                                });
                             });
-                        });
-                    } catch { /* skip malformed events */ }
-                });
-            } catch { /* skip failed calendar */ }
-            all.push({ calendar: cal, events: callEvents });
-        }
+                        } catch { /* skip malformed events */ }
+                    });
+                } catch { /* skip failed calendar */ }
+                all.push({ calendar: cal, events: callEvents });
+            }
 
-        setCalEvents(all);
-        setLoadingStatus(false);
-    }, [currentDate]);
+            setCalEvents(all);
+        } catch (e: any) {
+            addNotification("Calendar", `Failed to load events: ${e.message}`, 'error');
+        } finally {
+            setLoadingStatus(false);
+        }
+    }, [currentDate, addNotification]);
 
     useEffect(() => {
         loadEvents();
@@ -155,7 +159,6 @@ const CalendarPage: React.FC = () => {
         });
         setIsEditMode(true);
         setEditingObject(event.calendarObject ?? null);
-        setEditingCalIndex(event.calendarIndex ?? 0);
         setShowForm(true);
     };
 

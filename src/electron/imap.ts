@@ -9,7 +9,8 @@ async function getConnection(credentials: { email: string; password: string; hos
     const changed =
         !_currentCredentials ||
         _currentCredentials.email !== credentials.email ||
-        _currentCredentials.host !== credentials.host;
+        _currentCredentials.host !== credentials.host ||
+        _currentCredentials.password !== credentials.password;
 
     if (!_connection || changed) {
         if (_connection) {
@@ -71,9 +72,16 @@ export class ImapManager {
             connection.end();
             return { status: 'success' };
         } catch (error: any) {
-            switch (error.code) {
-                case 'ENOTFOUND':
+            // Detect authentication failures to allow MFA fallback in the renderer
+            const isAuthFailure =
+                error.textCode === 'AUTHENTICATIONFAILED' ||
+                error.source === 'authentication' ||
+                /authenti/i.test(error.message ?? '');
+            switch (true) {
+                case error.code === 'ENOTFOUND':
                     return { status: 'host-not-found' };
+                case isAuthFailure:
+                    return { status: 'credentials' };
                 default:
                     return { status: 'unkonw', info: error.code ?? error.textCode };
             }

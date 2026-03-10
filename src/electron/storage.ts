@@ -12,9 +12,9 @@ export const saveCredentials = async (params: { email: string, password: string,
 
 export const getCredentials = async (): Promise<UserCredentials> => {
     return {
-        email: await keytar.getPassword(SERVICE, "email") + "",
-        password: await keytar.getPassword(SERVICE, "password") + "",
-        host: await keytar.getPassword(SERVICE, "host") + ""
+        email: await keytar.getPassword(SERVICE, "email") ?? '',
+        password: await keytar.getPassword(SERVICE, "password") ?? '',
+        host: await keytar.getPassword(SERVICE, "host") ?? '',
     };
 };
 

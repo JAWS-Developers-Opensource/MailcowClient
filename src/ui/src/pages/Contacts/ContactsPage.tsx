@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ContactsPage.css';
 import { DAVAddressBook, DAVVCard } from 'tsdav';
 import { Contact, parseVCard } from '../../types/contact.types';
@@ -11,7 +11,6 @@ const ContactsPage: React.FC = () => {
 
     const [addressBooks, setAddressBooks] = useState<DAVAddressBook[]>([]);
     const [selectedBook, setSelectedBook] = useState<DAVAddressBook | null>(null);
-    const [rawVCards, setRawVCards] = useState<DAVVCard[]>([]);
     const [contacts, setContacts] = useState<(Contact & { vCard: DAVVCard })[]>([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
@@ -22,13 +21,13 @@ const ContactsPage: React.FC = () => {
 
     // ── Load address books ────────────────────────────────────────────────────
 
-    const loadAddressBooks = useCallback(async () => {
+    const loadAddressBooks = async () => {
         setLoading(true);
         try {
             await window.electron.cardCreateConn();
             const books = await window.electron.cardFetchAddressBooks();
             setAddressBooks(books);
-            if (books.length > 0 && !selectedBook) {
+            if (books.length > 0) {
                 setSelectedBook(books[0]);
                 await loadContacts(books[0]);
             }
@@ -36,13 +35,12 @@ const ContactsPage: React.FC = () => {
             addNotification("Contacts", `Failed to load address books: ${e.message}`, 'error');
         }
         setLoading(false);
-    }, []);
+    };
 
     const loadContacts = async (book: DAVAddressBook) => {
         setLoading(true);
         try {
             const vcards = await window.electron.cardFetchContacts(book);
-            setRawVCards(vcards);
             const parsed = vcards.map((vc) => ({
                 ...parseVCard(vc.data ?? ''),
                 vCard: vc,

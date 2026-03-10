@@ -3,7 +3,6 @@ import EmailList from '../../components/email/EmailListComponent';
 import SelectedEmail from '../../components/email/SelectedEmailComponent';
 import ComposeEmailComponent from '../../components/email/ComposeEmailComponent';
 import './MailPage.css';
-import { useLoading } from '../../contexts/LoadingContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import { ImapEmail, ImapEmailBody } from '../../types/mail.types';
 import { FiRefreshCw, FiEdit, FiChevronRight, FiChevronDown } from 'react-icons/fi';
@@ -11,7 +10,6 @@ import { FiRefreshCw, FiEdit, FiChevronRight, FiChevronDown } from 'react-icons/
 const PAGE_SIZE = 30;
 
 const MailPage: React.FC = () => {
-    const { setLoadingStatus } = useLoading();
     const { addNotification } = useNotification();
 
     const [folders, setFolders] = useState<string[]>([]);
@@ -52,7 +50,7 @@ const MailPage: React.FC = () => {
             addNotification("", `IMAP error: ${e.message}`, 'error');
         }
         setEmailsLoading(false);
-    }, []);
+    }, [addNotification]);
 
     // ── Select email ──────────────────────────────────────────────────────────
 
