@@ -1,0 +1,136 @@
+.compose-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.compose-modal {
+    background: var(--sidebar-background-color, #fff);
+    border-radius: 8px;
+    width: 520px;
+    max-width: 95vw;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.compose-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--primary-color, #3498db);
+    color: #fff;
+    padding: 12px 16px;
+}
+
+.compose-header h3 { margin: 0; font-size: 1rem; }
+
+.compose-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0.8;
+    line-height: 1;
+}
+
+.compose-close-btn:hover { opacity: 1; }
+
+.compose-field {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 6px 16px;
+}
+
+.compose-field label {
+    width: 56px;
+    font-size: 0.82rem;
+    color: #777;
+    flex-shrink: 0;
+}
+
+.compose-to-row {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+}
+
+.compose-field input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    background: transparent;
+    color: var(--text-color, #333);
+}
+
+.compose-cc-toggle {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.compose-cc-toggle:hover { background: #f0f0f0; }
+
+.compose-body {
+    flex: 1;
+    padding: 10px 16px;
+}
+
+.compose-body textarea {
+    width: 100%;
+    height: 200px;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 0.92rem;
+    font-family: inherit;
+    background: transparent;
+    color: var(--text-color, #333);
+}
+
+.compose-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.compose-send-btn {
+    background: var(--primary-color, #3498db);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.compose-send-btn:hover:not(:disabled) { opacity: 0.85; }
+.compose-send-btn:disabled { opacity: 0.6; cursor: default; }
+
+.compose-discard-btn {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.compose-discard-btn:hover { background: #f5f5f5; }

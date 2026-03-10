@@ -59,3 +59,17 @@ export const removeOAuth2Credentials = async (): Promise<void> => {
     await keytar.deletePassword(SERVICE, "oauth2_accessToken");
     await keytar.deletePassword(SERVICE, "oauth2_refreshToken");
 };
+
+// ─── Mailcow API key ──────────────────────────────────────────────────────────
+
+export const saveApiKey = async (apiKey: string): Promise<void> => {
+    await keytar.setPassword(SERVICE, 'mailcow_api_key', apiKey);
+};
+
+export const getApiKey = async (): Promise<string | null> => {
+    return await keytar.getPassword(SERVICE, 'mailcow_api_key');
+};
+
+export const removeApiKey = async (): Promise<void> => {
+    await keytar.deletePassword(SERVICE, 'mailcow_api_key');
+};

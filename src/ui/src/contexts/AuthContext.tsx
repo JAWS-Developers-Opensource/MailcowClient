@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     headers: { Authorization: `Bearer ${oauth2.accessToken}` },
                 });
                 if (profileRes.ok) {
-                    addNotification("Welcome back", "success");
+                    addNotification("Auth", "Welcome back", "success");
                     setUser({ name: "", surname: "", email: oauth2.email, id: 0 });
                     setIsAuthenticated(true);
                     setLoadingStatus(false);
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     userCredentials.host
                 );
                 if (response.status === "success") {
-                    addNotification("Welcome back", "success");
+                    addNotification("Auth", "Welcome back", "success");
                     setUser({ name: "", surname: "", email: userCredentials.email, id: 0 });
                     setIsAuthenticated(true);
                     setLoadingStatus(false);

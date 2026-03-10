@@ -1,27 +1,149 @@
 .cal-sidebar-container {
-    padding: 20px
+    padding: 16px;
+    min-width: 200px;
+    max-width: 220px;
+    border-right: 1px solid #e0e0e0;
+    height: 100%;
+    overflow-y: auto;
 }
 
-.calendar-item {
-    list-style-type: none;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-    padding: 10px;
-    padding-left: 0px;
+.sidebar-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #777;
+    margin: 0 0 10px 0;
 }
 
 .add-event-button {
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
     width: 100%;
-    margin-top: 10px;
     margin-bottom: 10px;
-    border: 0px;
-    background-color: rgb(0, 187, 0);
-    border-radius: 10px;
+    border: 0;
+    background-color: var(--primary-color, rgb(0, 187, 0));
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
 }
 
-.add-event-button:hover {
+.add-event-button:hover { opacity: 0.85; }
+
+/* ── New calendar form ─────────────────────────────────────────────────────── */
+.new-cal-form {
+    background: var(--hover-background-color, #f0f4f8);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.new-cal-input {
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    outline: none;
+    background: #fff;
+}
+
+.new-cal-input:focus { border-color: var(--primary-color, #3498db); }
+
+.color-picker-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.color-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
     cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s;
+}
+
+.color-dot--selected {
+    border-color: #333;
+    transform: scale(1.2);
+}
+
+.new-cal-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.new-cal-save-btn {
+    flex: 1;
+    padding: 6px;
+    background: var(--primary-color, #3498db);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.new-cal-save-btn:disabled { opacity: 0.6; cursor: default; }
+
+.new-cal-cancel-btn {
+    flex: 1;
+    padding: 6px;
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: #666;
+}
+
+/* ── Calendar list ──────────────────────────────────────────────────────────── */
+.calendar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.calendar-item {
+    display: flex;
+    align-items: center;
+    padding: 7px 4px;
+    gap: 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.calendar-item:hover { background: var(--hover-background-color, #f0f0f0); }
+
+.calendar-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.calendar-label {
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-color, #333);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calendar-checkbox {
+    cursor: pointer;
+    flex-shrink: 0;
 }

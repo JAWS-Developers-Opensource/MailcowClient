@@ -1,46 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import { useTheme } from '../../contexts/ThemeContext'; // Importiamo il contesto del tema
+import React from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 import './SideBarComponent.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Sidebar = () => {
-    const { theme, toggleTheme } = useTheme(); // Ottieni il tema attuale e la funzione di toggle
+    const { theme, toggleTheme } = useTheme();
     const { logout } = useAuth();
-
     const nav = useNavigate();
+    const location = useLocation();
 
-    const handleSideBarNavigation = (path: string) => {
-        nav(path);
-    }
-    
+    const go = (path: string) => nav(path);
+    const isActive = (path: string) => location.pathname.startsWith(path);
+
     return (
-        <div className={`sidebar`}>
-            {/*<div className="sidebar-logo">{isExpanded ? (theme === 'dark' ? 'MyApp (Dark)' : 'MyApp (Light)') : (
-                <img src='https://avatars.githubusercontent.com/u/23747925?s=280&v=4' />
-            )}</div>*/}
+        <div className="sidebar">
             <div className="sidebar-menu">
                 <div className="sidebar-item-group">
-                    <button onClick={() => handleSideBarNavigation('/mail')} className="sidebar-item">
+                    <button
+                        onClick={() => go('/mail')}
+                        className={`sidebar-item${isActive('/mail') ? ' active' : ''}`}
+                        title="Mail"
+                    >
                         📧
                     </button>
                 </div>
                 <div className="sidebar-item-group">
-                    <button onClick={() => handleSideBarNavigation('/calendar')} className="sidebar-item">
+                    <button
+                        onClick={() => go('/calendar')}
+                        className={`sidebar-item${isActive('/calendar') ? ' active' : ''}`}
+                        title="Calendar"
+                    >
                         📅
                     </button>
                 </div>
                 <div className="sidebar-item-group">
-                    <button onClick={() => handleSideBarNavigation('/contacts')} className="sidebar-item">
+                    <button
+                        onClick={() => go('/contacts')}
+                        className={`sidebar-item${isActive('/contacts') ? ' active' : ''}`}
+                        title="Contacts"
+                    >
                         👥
+                    </button>
+                </div>
+                <div className="sidebar-item-group">
+                    <button
+                        onClick={() => go('/settings')}
+                        className={`sidebar-item${isActive('/settings') ? ' active' : ''}`}
+                        title="Settings"
+                    >
+                        ⚙️
                     </button>
                 </div>
             </div>
             <div className="sidebar-footer">
-                <button className="sidebar-item" onClick={toggleTheme}>
+                <button className="sidebar-item" onClick={toggleTheme} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
                     {theme === 'dark' ? '🌞' : '🌙'}
                 </button>
-                <button className="sidebar-item" onClick={logout}>
+                <button className="sidebar-item" onClick={logout} title="Sign out">
                     🚪
                 </button>
             </div>

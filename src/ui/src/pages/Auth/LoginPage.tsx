@@ -52,20 +52,20 @@ const LoginPage: React.FC = () => {
         const response = await window.electron.imapCheckCredentials(email, password, resolvedHost);
         switch (response.status) {
             case "success":
-                addNotification("Welcome back", "success");
+                addNotification("", "Welcome back", "success");
                 window.electron.saveUserCredentials({ email, password, host: resolvedHost });
                 login(email);
                 break;
             case "credentials":
                 // Auth failed — offer MFA step
                 setImapStep('mfa');
-                addNotification("Authentication failed. If 2FA is enabled, enter your TOTP code below.", "error");
+                addNotification("Auth", "Authentication failed. If 2FA is enabled, enter your TOTP code below.", "error");
                 break;
             case "host-not-found":
-                addNotification("Host not found. Check the server address.", "error");
+                addNotification("Contacts", "Host not found. Check the server address.", "error");
                 break;
             default:
-                addNotification(response.info + "", "error");
+                addNotification("", response.info + "", "error");
                 break;
         }
         setLoadingStatus(false);
@@ -80,23 +80,24 @@ const LoginPage: React.FC = () => {
         const response = await window.electron.imapCheckCredentials(email, combinedPassword, resolvedHost);
         switch (response.status) {
             case "success":
-                addNotification("Welcome back", "success");
+                addNotification("", "Welcome back", "success");
                 window.electron.saveUserCredentials({ email, password: combinedPassword, host: resolvedHost });
                 login(email);
                 break;
             case "credentials":
                 addNotification(
+                    "Auth",
                     "Authentication still failed. Consider using an app-specific password or switch to OAuth2 login.",
                     "error"
                 );
                 setImapStep('credentials');
                 break;
             case "host-not-found":
-                addNotification("Host not found.", "error");
+                addNotification("", "Host not found.", "error");
                 setImapStep('credentials');
                 break;
             default:
-                addNotification(response.info + "", "error");
+                addNotification("", response.info + "", "error");
                 break;
         }
         setLoadingStatus(false);
@@ -108,7 +109,7 @@ const LoginPage: React.FC = () => {
 
     const handleCheckOAuth2 = async () => {
         if (!oauthHost) {
-            addNotification("Please enter the Mailcow server host first.", "error");
+            addNotification("Mail", "Please enter the Mailcow server host first.", "error");
             return;
         }
         setOauthChecking(true);
@@ -117,15 +118,15 @@ const LoginPage: React.FC = () => {
         setOauthAvailable(result.available);
         setOauthChecking(false);
         if (!result.available) {
-            addNotification("OAuth2 is not available on this server, or the host is unreachable.", "error");
+            addNotification("Auth", "OAuth2 is not available on this server, or the host is unreachable.", "error");
         } else {
-            addNotification("OAuth2 is available on this server!", "success");
+            addNotification("Auth", "OAuth2 is available on this server!", "success");
         }
     };
 
     const handleOAuth2Login = async () => {
         if (!oauthClientId) {
-            addNotification("Please enter your OAuth2 Client ID.", "error");
+            addNotification("Auth", "Please enter your OAuth2 Client ID.", "error");
             return;
         }
         setLoadingStatus(true);
@@ -138,15 +139,15 @@ const LoginPage: React.FC = () => {
                 accessToken: result.accessToken,
                 refreshToken: result.refreshToken ?? null,
             });
-            addNotification("OAuth2 login successful!", "success");
+            addNotification("Auth", "OAuth2 login successful!", "success");
             login(result.email);
         } else {
             if (result.error === 'window_closed') {
-                addNotification("OAuth2 login was cancelled.", "error");
+                addNotification("Auth", "OAuth2 login was cancelled.", "error");
             } else if (result.error === 'timeout') {
-                addNotification("OAuth2 login timed out. Please try again.", "error");
+                addNotification("Auth", "OAuth2 login timed out. Please try again.", "error");
             } else {
-                addNotification(`OAuth2 error: ${result.error}`, "error");
+                addNotification("Auth", `OAuth2 error: ${result.error}`, "error");
             }
         }
         setLoadingStatus(false);

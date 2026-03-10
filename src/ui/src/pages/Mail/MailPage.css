@@ -1,22 +1,175 @@
 .mail-page {
     display: flex;
     height: 100vh;
+    overflow: hidden;
+    background: var(--background-color, #ededed);
 }
 
-.email-list-container {
-    width: 40%;
+/* ── Folder sidebar ──────────────────────────────────────────────────────── */
+.mail-folders {
+    width: 180px;
+    flex-shrink: 0;
+    background: var(--sidebar-background-color, #f8f9fa);
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
-    border-right: 1px solid #ccc;
 }
 
+.mail-folders-header {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.folder-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-color, #555);
+    padding: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.folder-list {
+    list-style: none;
+    padding: 6px 0;
+    margin: 0;
+    flex: 1;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-color, #333);
+    border-radius: 4px;
+    margin: 1px 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s;
+}
+
+.folder-item:hover {
+    background: var(--hover-background-color, #e8eaed);
+}
+
+.folder-item--active {
+    background: var(--primary-color, #3498db);
+    color: #fff;
+}
+
+.folder-item--active:hover {
+    background: var(--primary-color, #2980b9);
+}
+
+.mail-compose-area {
+    padding: 12px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.compose-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px 14px;
+    background: var(--primary-color, #3498db);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.compose-btn:hover { opacity: 0.85; }
+
+/* ── Email list pane ─────────────────────────────────────────────────────── */
+.email-list-container {
+    width: 320px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-right: 1px solid #e0e0e0;
+    background: var(--sidebar-background-color, #fff);
+}
+
+.email-list-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid #e0e0e0;
+    background: var(--sidebar-background-color, #f8f9fa);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.email-list-folder-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-color, #333);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color, #555);
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.icon-btn:hover { background: var(--hover-background-color, #e8eaed); }
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.email-list-loading {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.email-list-loading-more {
+    padding: 10px;
+    text-align: center;
+    color: #999;
+    font-size: 0.8rem;
+}
+
+/* ── Email reading pane ──────────────────────────────────────────────────── */
 .selected-email-container {
-    width: 60%;
-    padding: 20px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .no-email-div {
-    justify-content: center;
     display: flex;
+    justify-content: center;
     align-items: center;
-    margin-top: 100px;
+    height: 100%;
+    color: #aaa;
 }
