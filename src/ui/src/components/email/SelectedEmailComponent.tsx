@@ -6,7 +6,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import {
     FiCornerUpLeft, FiCornerUpRight, FiTrash2,
-    FiMoreHorizontal, FiEye, FiEyeOff, FiFolderPlus, FiDownload,
+    FiMoreHorizontal, FiEyeOff, FiFolderPlus, FiDownload, FiInfo,
 } from 'react-icons/fi';
 import UILogger from '../../helpers/UILogger';
 
@@ -17,6 +17,8 @@ interface Props {
     onMarkUnread?: () => void;
     folders?: string[];
     folder?: string;
+    mailbox?: string;
+    host?: string;
 }
 
 // Block common remote image patterns in email HTML for privacy/security.
@@ -31,7 +33,7 @@ function blockRemoteImages(html: string): string {
 }
 
 const SelectedEmailComponent: React.FC<Props> = ({
-    email, onDelete, onMove, onMarkUnread, folders = [], folder,
+    email, onDelete, onMove, onMarkUnread, folders = [], folder, mailbox, host,
 }) => {
     const { t } = useLanguage();
     const { addNotification } = useNotification();
@@ -41,6 +43,7 @@ const SelectedEmailComponent: React.FC<Props> = ({
     const [showMore, setShowMore]         = useState(false);
     const [showMoveMenu, setShowMoveMenu] = useState(false);
     const [imagesAllowed, setImagesAllowed] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
 
     const replySubject = email.subject?.startsWith('Re:')  ? email.subject : `Re: ${email.subject ?? ''}`;
     const fwdSubject   = email.subject?.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject ?? ''}`;
@@ -104,6 +107,9 @@ const SelectedEmailComponent: React.FC<Props> = ({
                         <FiTrash2 size={13} /> {t('mail.delete')}
                     </button>
                 )}
+                <button className="email-action-btn" onClick={() => setShowInfo(true)}>
+                    <FiInfo size={13} /> Info
+                </button>
 
                 {/* More actions */}
                 <div className="email-more-wrapper">
@@ -163,11 +169,6 @@ const SelectedEmailComponent: React.FC<Props> = ({
             {/* ── Header ─────────────────────────────────────────── */}
             <div className="selected-email-header">
                 <h2 className="selected-email-subject">{email.subject}</h2>
-                <div className="selected-email-meta">
-                    <span className="meta-row"><span className="meta-key">From</span>{email.from}</span>
-                    <span className="meta-row"><span className="meta-key">To</span>{email.to}</span>
-                    <span className="meta-row"><span className="meta-key">Date</span>{email.date}</span>
-                </div>
             </div>
 
             {/* ── Body ───────────────────────────────────────────── */}
@@ -183,6 +184,27 @@ const SelectedEmailComponent: React.FC<Props> = ({
                     <pre className="email-text">{email.bodyText}</pre>
                 )}
             </div>
+
+            {showInfo && (
+                <div className="email-info-overlay" onClick={() => setShowInfo(false)}>
+                    <div className="email-info-popup" onClick={(e) => e.stopPropagation()}>
+                        <div className="email-info-header">
+                            <h3>Email Info</h3>
+                            <button className="email-info-close" onClick={() => setShowInfo(false)}>Close</button>
+                        </div>
+                        <div className="email-info-grid">
+                            <div className="email-info-row"><span>UID</span><code>{email.uid ?? 'n/a'}</code></div>
+                            <div className="email-info-row"><span>Server</span><code>{host ?? 'n/a'}</code></div>
+                            <div className="email-info-row"><span>Mailbox</span><code>{mailbox ?? 'n/a'}</code></div>
+                            <div className="email-info-row"><span>Folder</span><code>{folder ?? 'n/a'}</code></div>
+                            <div className="email-info-row"><span>From</span><code>{email.from ?? 'n/a'}</code></div>
+                            <div className="email-info-row"><span>To</span><code>{email.to ?? 'n/a'}</code></div>
+                            <div className="email-info-row"><span>Date</span><code>{email.date ?? 'n/a'}</code></div>
+                            <div className="email-info-row"><span>Subject</span><code>{email.subject ?? 'n/a'}</code></div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

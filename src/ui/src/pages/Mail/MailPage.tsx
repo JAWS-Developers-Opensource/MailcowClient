@@ -3,6 +3,7 @@ import EmailList from '../../components/email/EmailListComponent';
 import SelectedEmail from '../../components/email/SelectedEmailComponent';
 import ComposeEmailComponent from '../../components/email/ComposeEmailComponent';
 import './MailPage.css';
+import '../../components/email/EmailItemComponent.css';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { ImapEmail, ImapEmailBody } from '../../types/mail.types';
@@ -159,6 +160,8 @@ const MailPage: React.FC = () => {
     const [hasMore, setHasMore]                   = useState(false);
     const [emailsLoading, setEmailsLoading]       = useState(false);
     const [showCompose, setShowCompose]           = useState(false);
+    const [accountEmail, setAccountEmail]         = useState('');
+    const [accountHost, setAccountHost]           = useState('');
 
     const folderTree = useMemo(() => buildFolderTree(folders), [folders]);
     const conversations = useMemo(() => groupIntoConversations(emails), [emails]);
@@ -277,6 +280,13 @@ const MailPage: React.FC = () => {
     useEffect(() => {
         loadFolders();
         loadEmails('INBOX', 0, true);
+        window.electron.getUserCredentials().then((creds) => {
+            setAccountEmail(creds.email);
+            setAccountHost(creds.host);
+        }).catch(() => {
+            setAccountEmail('');
+            setAccountHost('');
+        });
     }, []);
 
     const handleRefresh = () => {
@@ -334,6 +344,8 @@ const MailPage: React.FC = () => {
                     <SelectedEmail
                         email={selectedEmailBody}
                         folder={selectedFolder}
+                        mailbox={accountEmail}
+                        host={accountHost}
                         folders={folders}
                         onDelete={selectedUid !== undefined
                             ? () => handleDeleteEmail({ uid: selectedUid, folder: selectedFolder } as ImapEmail)

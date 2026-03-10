@@ -6,6 +6,7 @@
     cursor: pointer;
     transition: background 0.12s;
     position: relative;
+    border-radius: 10px;
 }
 
 .email-item:hover { background: var(--hover-background-color, #f1f5fb); }
