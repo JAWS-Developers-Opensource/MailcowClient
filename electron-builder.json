@@ -4,12 +4,19 @@
     "productName": "Mailcow Client",
     "extraResources": ["dist-electron/preload.cjs"],
     "icon": "./desktopIcon.png",
+    "publish": [
+        {
+            "provider": "github",
+            "owner": "JAWS-Developers-Opensource",
+            "repo": "MailcowClient"
+        }
+    ],
     "mac": {
         "target": "dmg"
     },
     "linux": {
         "target": "AppImage",
-        "category": "Utilily"
+        "category": "Utility"
     },
     "win": {
         "target": ["portable", "msi"]

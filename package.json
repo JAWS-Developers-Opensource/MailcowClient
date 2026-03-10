@@ -59,7 +59,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "JAWS-Developers",
+        "owner": "JAWS-Developers-Opensource",
         "repo": "MailcowClient"
       }
     ]

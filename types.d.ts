@@ -104,6 +104,17 @@ type ParsedContact = {
     etag?: string;
 };
 
+// ─── Updater ──────────────────────────────────────────────────────────────────
+
+type UpdateInfo = {
+    updateAvailable: boolean;
+    currentVersion: string;
+    latestVersion: string;
+    releaseUrl: string;
+    releaseName: string;
+    releaseNotes: string;
+};
+
 // ─── IPC payload mapping ──────────────────────────────────────────────────────
 
 type EventPayloadMapping = {
@@ -145,6 +156,9 @@ type EventPayloadMapping = {
     // Settings
     settingsSaveApiKey: void;
     settingsGetApiKey: string | null;
+    // Updater
+    checkForUpdates: UpdateInfo;
+    getAppVersion: string;
 };
 
 // ─── Window.electron interface ────────────────────────────────────────────────
@@ -229,5 +243,8 @@ interface Window {
         // Settings
         settingsSaveApiKey: (apiKey: string) => Promise<void>;
         settingsGetApiKey: () => Promise<string | null>;
+        // Updater
+        checkForUpdates: () => Promise<UpdateInfo>;
+        getAppVersion: () => Promise<string>;
     };
 }

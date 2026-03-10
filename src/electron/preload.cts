@@ -39,6 +39,9 @@ contextBridge.exposeInMainWorld('electron', {
   // Settings
   settingsSaveApiKey: (apiKey) => ipcInvoke('settingsSaveApiKey', { apiKey }),
   settingsGetApiKey: () => ipcInvoke('settingsGetApiKey'),
+  // Updater
+  checkForUpdates: () => ipcInvoke('checkForUpdates'),
+  getAppVersion: () => ipcInvoke('getAppVersion'),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

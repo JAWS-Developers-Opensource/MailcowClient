@@ -12,8 +12,7 @@ import {
 import { createConn, getCalendars, queryCalendar, createEvent, updateEvent, deleteEvent, createCalendar } from './caldav.js';
 import { createCardDavConn, fetchAddressBooks, fetchContacts, createContact, updateContact, deleteContact } from './carddav.js';
 import { checkOAuth2Available, startOAuth2Login } from './oauth.js';
-
-type test = String;
+import { checkForUpdates, getAppVersion } from './updater.js';
 
 app.on('ready', () => {
     const mainWindow = new BrowserWindow({
@@ -93,6 +92,10 @@ app.on('ready', () => {
     // Settings
     ipcHandle('settingsSaveApiKey', (params) => saveApiKey(params.apiKey));
     ipcHandle('settingsGetApiKey', getApiKey);
+
+    // Updater
+    ipcHandle('checkForUpdates', checkForUpdates);
+    ipcHandle('getAppVersion', async () => getAppVersion());
 
     handleCloseEvents(mainWindow);
 });

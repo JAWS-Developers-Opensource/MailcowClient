@@ -11,9 +11,25 @@ import { CalendarStack } from './src/navigate/CalendarStack'
 import { VarsPorvider } from './src/contexts/VarContext'
 import { ContactStack } from './src/navigate/ContactStack'
 import SettingsPage from './src/pages/Settings/SettingsPage'
+import { useState, useEffect } from 'react'
+import UpdateModal from './src/components/frame/UpdateModal'
 
 
 function App() {
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+
+  useEffect(() => {
+    window.electron.checkForUpdates()
+      .then((info) => {
+        if (info.updateAvailable) {
+          setUpdateInfo(info);
+        }
+      })
+      .catch(() => {
+        // Silently ignore update check failures (e.g. no network)
+      });
+  }, []);
+
   return (
     <HashRouter>
       <ThemeProvider>
@@ -21,6 +37,16 @@ function App() {
           <NotificationProvider>
             <LoadingProvider>
               <AuthProvider>
+                {updateInfo && (
+                  <UpdateModal
+                    currentVersion={updateInfo.currentVersion}
+                    latestVersion={updateInfo.latestVersion}
+                    releaseName={updateInfo.releaseName}
+                    releaseNotes={updateInfo.releaseNotes}
+                    releaseUrl={updateInfo.releaseUrl}
+                    onDismiss={() => setUpdateInfo(null)}
+                  />
+                )}
                 <Routes>
                   <Route path='/auth' element={<LoginPage />} />
                   <Route
