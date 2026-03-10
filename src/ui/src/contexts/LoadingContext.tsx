@@ -1,6 +1,6 @@
 // loadingContext.tsx
 
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useCallback, useRef } from 'react';
 import LoadingScreen from '../components/frame/LoadingScreenComponent';
 
 interface LoadingContextProps {
@@ -24,10 +24,20 @@ interface LoadingProviderProps {
 
 const LoadingProvider = ({ children }: LoadingProviderProps) => {
     const [loading, setLoading] = useState<boolean>(true);
+    const startupFinishedRef = useRef(false);
 
-    // `useCallback` per evitare la ricreazione della funzione ad ogni render
+    // Show the global loading overlay only during the initial app bootstrap.
+    // After the first hide, subsequent "true" updates are ignored to prevent flicker.
     const setLoadingStatus = useCallback((status: boolean) => {
-        setLoading(status);
+        setLoading((prev) => {
+            if (status) {
+                if (startupFinishedRef.current) return prev;
+                return true;
+            }
+
+            startupFinishedRef.current = true;
+            return false;
+        });
     }, []);
 
     return (

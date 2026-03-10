@@ -1,11 +1,17 @@
 /* Frame generale */
 .cal-frame {
     display: flex;
+    height: 100%;
+    min-height: 0;
 }
 
 /* Contenuto principale (a destra della sidebar) */
 .cal-frame-content {
     /* Si adatta alla larghezza della sidebar */
     width: 100%;
+    flex: 1;
+    display: flex;
+    min-width: 0;
+    min-height: 0;
     background-color: var(--background-color);
 }

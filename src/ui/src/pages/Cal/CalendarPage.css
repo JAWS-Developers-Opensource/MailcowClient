@@ -1,7 +1,9 @@
 .calendar-page {
     display: flex;
     flex-direction: column;
+    flex: 1;
     height: 100%;
+    min-height: 0;
     background: var(--background-color, #f0f2f5);
     overflow: hidden;
 }
@@ -85,6 +87,7 @@
 /* ── Calendar body ───────────────────────────────────────────────────────── */
 .cal-body {
     flex: 1;
+    min-height: 0;
     overflow: hidden;
     padding: 12px;
     display: flex;

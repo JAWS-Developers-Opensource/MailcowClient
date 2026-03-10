@@ -39,6 +39,12 @@ contextBridge.exposeInMainWorld('electron', {
   // Settings
   settingsSaveApiKey: (apiKey) => ipcInvoke('settingsSaveApiKey', { apiKey }),
   settingsGetApiKey: () => ipcInvoke('settingsGetApiKey'),
+  settingsMailcowGetOverview: () => ipcInvoke('settingsMailcowGetOverview'),
+  settingsMailcowCreateAlias: (address, goto, active) => ipcInvoke('settingsMailcowCreateAlias', { address, goto, active }),
+  settingsMailcowDeleteAlias: (address) => ipcInvoke('settingsMailcowDeleteAlias', { address }),
+  settingsMailcowCreateAppPassword: (description, appPassword) => ipcInvoke('settingsMailcowCreateAppPassword', { description, appPassword }),
+  settingsMailcowDeleteAppPassword: (id) => ipcInvoke('settingsMailcowDeleteAppPassword', { id }),
+  settingsMailcowUpdateUserAcl: (aclJson) => ipcInvoke('settingsMailcowUpdateUserAcl', { aclJson }),
   // Updater
   checkForUpdates: () => ipcInvoke('checkForUpdates'),
   getAppVersion: () => ipcInvoke('getAppVersion'),

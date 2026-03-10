@@ -115,6 +115,13 @@ type UpdateInfo = {
     releaseNotes: string;
 };
 
+type MailcowOverview = {
+    mailbox: string;
+    mailboxInfo: any;
+    aliases: any;
+    appPasswords: any;
+};
+
 // ─── IPC payload mapping ──────────────────────────────────────────────────────
 
 type EventPayloadMapping = {
@@ -156,6 +163,12 @@ type EventPayloadMapping = {
     // Settings
     settingsSaveApiKey: void;
     settingsGetApiKey: string | null;
+    settingsMailcowGetOverview: MailcowOverview;
+    settingsMailcowCreateAlias: any;
+    settingsMailcowDeleteAlias: any;
+    settingsMailcowCreateAppPassword: any;
+    settingsMailcowDeleteAppPassword: any;
+    settingsMailcowUpdateUserAcl: any;
     // Updater
     checkForUpdates: UpdateInfo;
     getAppVersion: string;
@@ -243,6 +256,12 @@ interface Window {
         // Settings
         settingsSaveApiKey: (apiKey: string) => Promise<void>;
         settingsGetApiKey: () => Promise<string | null>;
+        settingsMailcowGetOverview: () => Promise<MailcowOverview>;
+        settingsMailcowCreateAlias: (address: string, goto?: string, active?: boolean) => Promise<any>;
+        settingsMailcowDeleteAlias: (address: string) => Promise<any>;
+        settingsMailcowCreateAppPassword: (description: string, appPassword: string) => Promise<any>;
+        settingsMailcowDeleteAppPassword: (id: string) => Promise<any>;
+        settingsMailcowUpdateUserAcl: (aclJson: string) => Promise<any>;
         // Updater
         checkForUpdates: () => Promise<UpdateInfo>;
         getAppVersion: () => Promise<string>;

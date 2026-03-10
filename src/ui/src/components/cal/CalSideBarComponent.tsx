@@ -20,7 +20,6 @@ export const CalSideBarComponent = () => {
 
     const loadCal = async () => {
         setLoadingStatus(true);
-        await window.electron.calCreateConn();
         window.electron.calGetCalendars().then((data: DAVCalendar[]) => {
             calendars.setCalendars(data);
             setLoadingStatus(false);

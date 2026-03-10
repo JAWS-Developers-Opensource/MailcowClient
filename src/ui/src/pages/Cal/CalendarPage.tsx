@@ -36,7 +36,7 @@ type RichEvent = ReactEventType & {
 
 const CalendarPage: React.FC = () => {
     const { setLoadingStatus, loading } = useLoading();
-    const { calendars } = useCalContext();
+    const { calendars, updateTriggers } = useCalContext();
     const { addNotification } = useNotification();
 
     const [events, setEvents] = useState<RichEvent[]>([]);
@@ -62,7 +62,6 @@ const CalendarPage: React.FC = () => {
         setCalEvents([]);
 
         try {
-            await window.electron.calCreateConn();
             const cals = await window.electron.calGetCalendars();
             setAllCalendars(cals);
             calendars.setCalendars(cals);
@@ -118,7 +117,7 @@ const CalendarPage: React.FC = () => {
             })
             .flatMap((c) => c.events);
         setEvents(visible);
-    }, [calendars, calEvents]);
+    }, [calEvents, updateTriggers.calendars]);
 
     // ── Navigate ──────────────────────────────────────────────────────────────
     const handleNavigate = (date: Date) => {

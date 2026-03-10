@@ -13,6 +13,14 @@ import { createConn, getCalendars, queryCalendar, createEvent, updateEvent, dele
 import { createCardDavConn, fetchAddressBooks, fetchContacts, createContact, updateContact, deleteContact } from './carddav.js';
 import { checkOAuth2Available, startOAuth2Login } from './oauth.js';
 import { checkForUpdates, getAppVersion } from './updater.js';
+import {
+    mailcowGetOverview,
+    mailcowCreateAlias,
+    mailcowDeleteAlias,
+    mailcowCreateAppPassword,
+    mailcowDeleteAppPassword,
+    mailcowUpdateUserAcl,
+} from './mailcow.js';
 
 app.on('ready', () => {
     const mainWindow = new BrowserWindow({
@@ -92,6 +100,12 @@ app.on('ready', () => {
     // Settings
     ipcHandle('settingsSaveApiKey', (params) => saveApiKey(params.apiKey));
     ipcHandle('settingsGetApiKey', getApiKey);
+    ipcHandle('settingsMailcowGetOverview', mailcowGetOverview);
+    ipcHandle('settingsMailcowCreateAlias', mailcowCreateAlias);
+    ipcHandle('settingsMailcowDeleteAlias', mailcowDeleteAlias);
+    ipcHandle('settingsMailcowCreateAppPassword', mailcowCreateAppPassword);
+    ipcHandle('settingsMailcowDeleteAppPassword', mailcowDeleteAppPassword);
+    ipcHandle('settingsMailcowUpdateUserAcl', mailcowUpdateUserAcl);
 
     // Updater
     ipcHandle('checkForUpdates', checkForUpdates);
