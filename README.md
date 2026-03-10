@@ -2,6 +2,7 @@
 # Mailcow Client
 
 A desktop email / calendar / contacts client for [Mailcow](https://mailcow.email) servers, built with Electron + React + TypeScript.
+***BY HERE I SAY THAT THE MOST CREDIT GOESE TO MAILCOW. WIHTOUT A SERVER WE COULDN'T HAVE ANY CLIENT***
 
 ## Quick start (development)
 
