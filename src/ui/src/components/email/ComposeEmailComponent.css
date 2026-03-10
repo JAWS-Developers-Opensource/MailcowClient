@@ -1,65 +1,123 @@
+/* ── Overlay ─────────────────────────────────────────────────────────────── */
 .compose-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.45);
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    padding: 20px;
+    pointer-events: none;
     z-index: 1000;
 }
 
+.compose-overlay--fullscreen {
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
 .compose-modal {
+    position: absolute;
+    bottom: 20px;
+    right: 24px;
+    width: 560px;
+    max-width: calc(100vw - 48px);
+    height: 520px;
+    max-height: 90vh;
     background: var(--sidebar-background-color, #fff);
-    border-radius: 8px;
-    width: 520px;
-    max-width: 95vw;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    pointer-events: all;
+    animation: composeSlideUp 0.22s ease-out;
 }
 
+@keyframes composeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.compose-modal--fullscreen {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 90vw;
+    height: 90vh;
+    max-width: 920px;
+    max-height: 96vh;
+    animation: none;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
 .compose-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--primary-color, #3498db);
+    background: var(--primary-color, #007bff);
     color: #fff;
-    padding: 12px 16px;
+    padding: 11px 16px;
+    flex-shrink: 0;
 }
 
-.compose-header h3 { margin: 0; font-size: 1rem; }
+.compose-header-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+}
 
-.compose-close-btn {
+.compose-header-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.compose-icon-btn {
     background: none;
     border: none;
-    color: #fff;
-    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
-    opacity: 0.8;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s;
 }
 
-.compose-close-btn:hover { opacity: 1; }
+.compose-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* ── Recipient fields ────────────────────────────────────────────────────── */
+.compose-fields {
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
 
 .compose-field {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 6px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding: 5px 14px;
 }
 
+.compose-field:last-child { border-bottom: none; }
+
 .compose-field label {
-    width: 56px;
-    font-size: 0.82rem;
-    color: #777;
+    width: 54px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #94a3b8;
     flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .compose-to-row {
     display: flex;
     flex: 1;
+    align-items: center;
     gap: 6px;
 }
 
@@ -69,68 +127,140 @@
     outline: none;
     font-size: 0.9rem;
     background: transparent;
-    color: var(--text-color, #333);
+    color: var(--text-color, #2d3748);
+    padding: 3px 0;
 }
 
-.compose-cc-toggle {
+.compose-extra-btns {
+    display: flex;
+    gap: 4px;
+}
+
+.compose-extra-btns button {
     background: none;
-    border: 1px solid #ccc;
+    border: 1px solid #d1d5db;
     border-radius: 4px;
     padding: 2px 8px;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
+    font-weight: 600;
     cursor: pointer;
-    color: #555;
+    color: #64748b;
+    transition: background 0.15s;
 }
 
-.compose-cc-toggle:hover { background: #f0f0f0; }
+.compose-extra-btns button:hover { background: #f1f5f9; }
 
+/* ── Formatting toolbar ──────────────────────────────────────────────────── */
+.compose-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background: var(--hover-background-color, #f8fafc);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.compose-toolbar-select {
+    padding: 3px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    background: var(--sidebar-background-color, #fff);
+    color: var(--text-color, #2d3748);
+    cursor: pointer;
+    outline: none;
+    max-width: 130px;
+}
+
+.compose-toolbar-size { max-width: 56px; }
+
+.compose-toolbar-divider {
+    width: 1px;
+    height: 18px;
+    background: #e2e8f0;
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+.compose-toolbar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    color: var(--text-color, #4a5568);
+    transition: background 0.12s;
+}
+
+.compose-toolbar-btn:hover { background: var(--hover-background-color, #e8edf2); }
+
+/* ── Editor area ─────────────────────────────────────────────────────────── */
 .compose-body {
     flex: 1;
-    padding: 10px 16px;
+    overflow-y: auto;
+    padding: 12px 16px;
 }
 
-.compose-body textarea {
-    width: 100%;
-    height: 200px;
-    border: none;
+.compose-editor {
+    min-height: 100%;
     outline: none;
-    resize: none;
-    font-size: 0.92rem;
-    font-family: inherit;
-    background: transparent;
-    color: var(--text-color, #333);
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text-color, #2d3748);
+    word-break: break-word;
 }
 
+.compose-editor:empty::before {
+    content: attr(data-placeholder);
+    color: #b0bec5;
+    pointer-events: none;
+}
+
+.compose-editor a { color: var(--primary-color, #007bff); }
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
 .compose-footer {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 10px 16px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    flex-shrink: 0;
+    background: var(--sidebar-background-color, #fff);
 }
 
 .compose-send-btn {
-    background: var(--primary-color, #3498db);
+    background: var(--primary-color, #007bff);
     color: #fff;
     border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
+    padding: 8px 22px;
+    border-radius: 6px;
     font-size: 0.9rem;
-    cursor: pointer;
     font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
 }
 
 .compose-send-btn:hover:not(:disabled) { opacity: 0.85; }
-.compose-send-btn:disabled { opacity: 0.6; cursor: default; }
+.compose-send-btn:disabled { opacity: 0.5; cursor: default; }
 
 .compose-discard-btn {
     background: none;
-    border: 1px solid #ccc;
+    border: 1px solid #d1d5db;
     padding: 8px 16px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
-    color: #666;
+    color: #64748b;
+    transition: background 0.15s;
 }
 
-.compose-discard-btn:hover { background: #f5f5f5; }
+.compose-discard-btn:hover { background: #f1f5f9; }
+.compose-discard-btn:disabled { opacity: 0.5; cursor: default; }
