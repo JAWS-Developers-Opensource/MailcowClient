@@ -1,0 +1,93 @@
+name: 📧 Email / IMAP / SMTP Issue
+description: Report a problem specific to email reading, sending, or folder management
+title: "[Email]: "
+labels: ["email", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for issues related to reading emails (IMAP), sending emails (SMTP), folders, or message management.
+
+  - type: dropdown
+    id: email_area
+    attributes:
+      label: Email Sub-area
+      options:
+        - IMAP login / connection
+        - Loading email list
+        - Reading email body
+        - HTML email rendering
+        - Sending email (SMTP)
+        - Reply / Forward
+        - Delete / Move message
+        - Folder list
+        - Mark as read/unread
+        - Infinite scroll / pagination
+    validations:
+      required: true
+
+  - type: input
+    id: imap_host
+    attributes:
+      label: IMAP/SMTP Host
+      description: The hostname of your Mailcow server (e.g. `mail.example.com`). Do NOT include credentials.
+      placeholder: "mail.example.com"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: auth_method
+    attributes:
+      label: Authentication Method
+      options:
+        - IMAP password
+        - OAuth2 / SSO
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Issue
+      placeholder: "When I try to open my Inbox, the list is always empty even though there are messages on the server …"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Log in with IMAP
+        2. Select folder 'Sent'
+        3. Scroll to the bottom
+        4. More emails don't load
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Electron / DevTools Errors
+      description: Open DevTools (Ctrl+Shift+I) and paste errors from the Console tab.
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Context
+      description: Mailcow version, server config, whether MFA is enabled, etc.

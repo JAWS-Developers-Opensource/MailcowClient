@@ -1,0 +1,123 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in MailcowClient
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out this form as completely as possible.
+
+  - type: input
+    id: version
+    attributes:
+      label: MailcowClient Version
+      description: Which version of MailcowClient are you running? (check the title bar or `package.json`)
+      placeholder: "e.g. 0.0.8"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS 15 (Sequoia)
+        - macOS 14 (Sonoma)
+        - macOS 13 (Ventura)
+        - Ubuntu 24.04
+        - Ubuntu 22.04
+        - Other Linux
+    validations:
+      required: true
+
+  - type: dropdown
+    id: auth_method
+    attributes:
+      label: Authentication Method
+      description: How are you logged in?
+      options:
+        - IMAP (password)
+        - OAuth2 / SSO
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      description: Which part of the app is affected?
+      options:
+        - Login / Authentication
+        - Email — reading
+        - Email — sending (SMTP)
+        - Email — folders
+        - Calendar — event display
+        - Calendar — create/edit/delete event
+        - Calendar — new calendar
+        - Contacts — view
+        - Contacts — create/edit/delete
+        - Settings
+        - Theme / UI
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "When I click … the app does … instead of …"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the bug.
+      placeholder: |
+        1. Open the app and log in
+        2. Navigate to '…'
+        3. Click '…'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Screen Recordings
+      description: If applicable, paste screenshots or a screen recording link.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console / Error Logs
+      description: Open DevTools (Ctrl+Shift+I / Cmd+Option+I) and paste any relevant errors.
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Context
+      description: Anything else that might help us investigate (Mailcow version, server config, etc.)

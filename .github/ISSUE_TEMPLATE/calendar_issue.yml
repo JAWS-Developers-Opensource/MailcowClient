@@ -1,0 +1,90 @@
+name: 📅 Calendar / CalDAV Issue
+description: Report a problem with calendar display, event creation/editing, or CalDAV connectivity
+title: "[Calendar]: "
+labels: ["calendar", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for issues related to the Calendar section (CalDAV), including event creation, editing, deletion, and calendar management.
+
+  - type: dropdown
+    id: calendar_area
+    attributes:
+      label: Calendar Sub-area
+      options:
+        - CalDAV connection
+        - Calendar list (sidebar)
+        - Create new calendar
+        - Event display / rendering
+        - Create event
+        - Edit event
+        - Delete event
+        - Month navigation
+        - Calendar visibility toggle
+        - Event colors
+    validations:
+      required: true
+
+  - type: input
+    id: caldav_host
+    attributes:
+      label: CalDAV Server Host
+      description: The hostname of your server (e.g. `mail.example.com`). Do NOT include credentials.
+      placeholder: "mail.example.com"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Issue
+      placeholder: "When I try to create a new event, the form saves but the event doesn't appear on the calendar …"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Navigate to Calendar
+        2. Click on a date slot
+        3. Fill in title and time
+        4. Click 'Create Event'
+        5. Event does not appear
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: ics_data
+    attributes:
+      label: ICS / CalDAV Error Data
+      description: If the server returned an error or invalid ICS data, paste it here.
+      render: text
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Electron / DevTools Errors
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Context
+      description: CalDAV server software (SOGo, Radicale, etc.), Mailcow version, etc.

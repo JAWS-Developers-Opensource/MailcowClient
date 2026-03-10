@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions (questions & ideas)
+    url: https://github.com/JAWS-Developers-Opensource/MailcowClient/discussions
+    about: For general questions, ideas, or community chat, please use Discussions instead of Issues.
+  - name: 🐄 Mailcow Community Forum
+    url: https://community.mailcow.email
+    about: For questions about Mailcow server configuration, visit the official Mailcow community forum.
