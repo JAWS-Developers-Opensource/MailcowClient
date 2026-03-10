@@ -62,7 +62,7 @@ const LoginPage: React.FC = () => {
                 addNotification("Auth", "Authentication failed. If 2FA is enabled, enter your TOTP code below.", "error");
                 break;
             case "host-not-found":
-                addNotification("Contacts", "Host not found. Check the server address.", "error");
+                addNotification("Auth", "Host not found. Check the server address.", "error");
                 break;
             default:
                 addNotification("", response.info + "", "error");

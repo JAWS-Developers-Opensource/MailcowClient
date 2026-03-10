@@ -70,6 +70,7 @@ const SettingsPage: React.FC = () => {
     const usedMB = mailboxInfo?.quota_used ? Math.round(mailboxInfo.quota_used / 1024 / 1024) : 0;
     const totalMB = mailboxInfo?.quota ? Math.round(mailboxInfo.quota / 1024 / 1024) : 0;
     const quotaPct = totalMB > 0 ? Math.round((usedMB / totalMB) * 100) : 0;
+    const quotaColor = quotaPct > 80 ? '#e74c3c' : 'var(--primary-color, #3498db)';
 
     return (
         <div className="settings-page">
@@ -156,7 +157,7 @@ const SettingsPage: React.FC = () => {
                                     <div className="quota-bar">
                                         <div
                                             className="quota-bar-fill"
-                                            style={{ width: `${quotaPct}%`, background: quotaPct > 80 ? '#e74c3c' : 'var(--primary-color, #3498db)' }}
+                                            style={{ width: `${quotaPct}%`, background: quotaColor }}
                                         />
                                     </div>
                                     <span className="quota-label">{usedMB} MB / {totalMB} MB ({quotaPct}%)</span>
