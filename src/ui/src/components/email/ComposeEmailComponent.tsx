@@ -48,6 +48,9 @@ const ComposeEmailComponent: React.FC<ComposeEmailProps> = ({
         }
     }, []);
 
+    // Note: document.execCommand is deprecated in the web spec but remains fully
+    // supported in Electron's Chromium renderer. For a standalone web app a library
+    // like Tiptap would be preferred; here we avoid an extra dependency.
     const exec = useCallback((command: string, value?: string) => {
         document.execCommand(command, false, value);
         editorRef.current?.focus();

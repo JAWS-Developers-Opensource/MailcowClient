@@ -62,7 +62,7 @@ const SelectedEmailComponent = ({ email, onDelete }: { email: ImapEmailBody; onD
                     <iframe
                         className="email-iframe"
                         srcDoc={email.bodyHtml}
-                        sandbox="allow-same-origin"
+                        sandbox=""
                         title="Email body"
                     />
                 ) : (
