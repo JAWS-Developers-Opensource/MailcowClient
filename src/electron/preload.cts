@@ -8,7 +8,12 @@ contextBridge.exposeInMainWorld('electron', {
   removeUserCredentials: () => ipcInvoke("removeUserCredentials"),
   calCreateConn: () => ipcInvoke("calCreateConn"),
   calGetCalendars: () => ipcInvoke("calGetCalendars"),
-  calQueryCalendar: (calendar, month, year) => ipcInvoke("calQueryCalendar", { calendar, month, year })
+  calQueryCalendar: (calendar, month, year) => ipcInvoke("calQueryCalendar", { calendar, month, year }),
+  checkOAuth2Available: (host) => ipcInvoke("checkOAuth2Available", { host }),
+  startOAuth2Login: (host, clientId, clientSecret) => ipcInvoke("startOAuth2Login", { host, clientId, clientSecret }),
+  saveOAuth2Credentials: (credentials) => ipcInvoke("saveOAuth2Credentials", credentials),
+  getOAuth2Credentials: () => ipcInvoke("getOAuth2Credentials"),
+  removeOAuth2Credentials: () => ipcInvoke("removeOAuth2Credentials"),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
