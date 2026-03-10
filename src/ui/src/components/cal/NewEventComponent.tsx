@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './NewEventComponent.css';
 import { DAVCalendar } from 'tsdav';
 
@@ -19,6 +19,7 @@ interface NewEventProps {
     closePopup: () => void;
     calendars: DAVCalendar[];
     isEdit?: boolean;
+    onDelete?: () => void;
 }
 
 const NewEventComponent: React.FC<NewEventProps> = ({
@@ -28,6 +29,7 @@ const NewEventComponent: React.FC<NewEventProps> = ({
     closePopup,
     calendars,
     isEdit = false,
+    onDelete,
 }) => {
     return (
         <div className="popup-overlay">
@@ -136,6 +138,11 @@ const NewEventComponent: React.FC<NewEventProps> = ({
                     <button className="add-event-btn" onClick={handleSaveEvent}>
                         {isEdit ? 'Save Changes' : 'Create Event'}
                     </button>
+                    {isEdit && onDelete && (
+                        <button className="delete-event-btn" onClick={onDelete}>
+                            🗑 Delete
+                        </button>
+                    )}
                     <button className="cancel-footer-btn" onClick={closePopup}>Cancel</button>
                 </div>
             </div>

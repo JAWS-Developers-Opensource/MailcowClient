@@ -1,7 +1,7 @@
 {
   "name": "mailcowclient",
   "private": true,
-  "version": "0.0.8",
+  "version": "0.0.10",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -59,7 +59,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "JAWS-Developers",
+        "owner": "JAWS-Developers-Opensource",
         "repo": "MailcowClient"
       }
     ]

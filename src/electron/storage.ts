@@ -1,4 +1,5 @@
 import keytar from 'keytar';
+import Logger from './helpers/Logger.js';
 
 const SERVICE = 'MailCowClient';
 
@@ -72,4 +73,48 @@ export const getApiKey = async (): Promise<string | null> => {
 
 export const removeApiKey = async (): Promise<void> => {
     await keytar.deletePassword(SERVICE, 'mailcow_api_key');
+};
+
+// ─── Multi-account ────────────────────────────────────────────────────────────
+
+type StoredAccount = { email: string; password: string; host: string; label?: string };
+type PublicAccount  = { email: string; host: string; label?: string };
+
+const getAllAccounts = async (): Promise<StoredAccount[]> => {
+    const raw = await keytar.getPassword(SERVICE, 'accounts');
+    if (!raw) return [];
+    try {
+        return JSON.parse(raw) as StoredAccount[];
+    } catch (e) {
+        // Malformed JSON — discard and reset
+        Logger.error('storage', 'Failed to parse accounts JSON, resetting', e);
+        return [];
+    }
+};
+
+/** Returns account list without passwords so it is safe to expose to the renderer. */
+export const getAccounts = async (): Promise<PublicAccount[]> => {
+    const all = await getAllAccounts();
+    return all.map(({ email, host, label }) => ({ email, host, label }));
+};
+
+export const saveAccount = async (account: StoredAccount): Promise<void> => {
+    const existing = await getAllAccounts();
+    const idx = existing.findIndex((a) => a.email === account.email && a.host === account.host);
+    if (idx >= 0) existing[idx] = account;
+    else existing.push(account);
+    await keytar.setPassword(SERVICE, 'accounts', JSON.stringify(existing));
+};
+
+export const removeAccount = async (params: { email: string; host: string }): Promise<void> => {
+    const existing = await getAllAccounts();
+    const filtered = existing.filter((a) => !(a.email === params.email && a.host === params.host));
+    await keytar.setPassword(SERVICE, 'accounts', JSON.stringify(filtered));
+};
+
+export const switchAccount = async (params: { email: string; host: string }): Promise<void> => {
+    const accounts = await getAllAccounts();
+    const target = accounts.find((a) => a.email === params.email && a.host === params.host);
+    if (!target) return;
+    await saveCredentials(target);
 };

@@ -8,14 +8,24 @@ import {
     getCredentials, removeCredentials, saveCredentials,
     getOAuth2Credentials, removeOAuth2Credentials, saveOAuth2Credentials,
     saveApiKey, getApiKey,
+    getAccounts, saveAccount, removeAccount, switchAccount,
 } from './storage.js';
 import { createConn, getCalendars, queryCalendar, createEvent, updateEvent, deleteEvent, createCalendar } from './caldav.js';
 import { createCardDavConn, fetchAddressBooks, fetchContacts, createContact, updateContact, deleteContact } from './carddav.js';
 import { checkOAuth2Available, startOAuth2Login } from './oauth.js';
-
-type test = String;
+import { checkForUpdates, getAppVersion } from './updater.js';
+import {
+    mailcowGetOverview,
+    mailcowCreateAlias,
+    mailcowDeleteAlias,
+    mailcowCreateAppPassword,
+    mailcowDeleteAppPassword,
+    mailcowUpdateUserAcl,
+} from './mailcow.js';
+import Logger from './helpers/Logger.js';
 
 app.on('ready', () => {
+    Logger.info('App ready — launching MailcowClient');
     const mainWindow = new BrowserWindow({
         webPreferences: {
             preload: getPreloadPath(),
@@ -93,7 +103,24 @@ app.on('ready', () => {
     // Settings
     ipcHandle('settingsSaveApiKey', (params) => saveApiKey(params.apiKey));
     ipcHandle('settingsGetApiKey', getApiKey);
+    ipcHandle('settingsMailcowGetOverview', mailcowGetOverview);
+    ipcHandle('settingsMailcowCreateAlias', mailcowCreateAlias);
+    ipcHandle('settingsMailcowDeleteAlias', mailcowDeleteAlias);
+    ipcHandle('settingsMailcowCreateAppPassword', mailcowCreateAppPassword);
+    ipcHandle('settingsMailcowDeleteAppPassword', mailcowDeleteAppPassword);
+    ipcHandle('settingsMailcowUpdateUserAcl', mailcowUpdateUserAcl);
 
+    // Updater
+    ipcHandle('checkForUpdates', checkForUpdates);
+    ipcHandle('getAppVersion', async () => getAppVersion());
+
+    // Multi-account
+    ipcHandle('getAccounts', getAccounts);
+    ipcHandle('saveAccount', saveAccount);
+    ipcHandle('removeAccount', removeAccount);
+    ipcHandle('switchAccount', switchAccount);
+
+    Logger.info('All IPC handlers registered');
     handleCloseEvents(mainWindow);
 });
 

@@ -104,6 +104,24 @@ type ParsedContact = {
     etag?: string;
 };
 
+// ─── Updater ──────────────────────────────────────────────────────────────────
+
+type UpdateInfo = {
+    updateAvailable: boolean;
+    currentVersion: string;
+    latestVersion: string;
+    releaseUrl: string;
+    releaseName: string;
+    releaseNotes: string;
+};
+
+type MailcowOverview = {
+    mailbox: string;
+    mailboxInfo: any;
+    aliases: any;
+    appPasswords: any;
+};
+
 // ─── IPC payload mapping ──────────────────────────────────────────────────────
 
 type EventPayloadMapping = {
@@ -145,6 +163,20 @@ type EventPayloadMapping = {
     // Settings
     settingsSaveApiKey: void;
     settingsGetApiKey: string | null;
+    settingsMailcowGetOverview: MailcowOverview;
+    settingsMailcowCreateAlias: any;
+    settingsMailcowDeleteAlias: any;
+    settingsMailcowCreateAppPassword: any;
+    settingsMailcowDeleteAppPassword: any;
+    settingsMailcowUpdateUserAcl: any;
+    // Updater
+    checkForUpdates: UpdateInfo;
+    getAppVersion: string;
+    // Multi-account (password never returned to renderer)
+    getAccounts: { email: string; host: string; label?: string }[];
+    saveAccount: void;
+    removeAccount: void;
+    switchAccount: void;
 };
 
 // ─── Window.electron interface ────────────────────────────────────────────────
@@ -229,5 +261,19 @@ interface Window {
         // Settings
         settingsSaveApiKey: (apiKey: string) => Promise<void>;
         settingsGetApiKey: () => Promise<string | null>;
+        settingsMailcowGetOverview: () => Promise<MailcowOverview>;
+        settingsMailcowCreateAlias: (address: string, goto?: string, active?: boolean) => Promise<any>;
+        settingsMailcowDeleteAlias: (address: string) => Promise<any>;
+        settingsMailcowCreateAppPassword: (description: string, appPassword: string) => Promise<any>;
+        settingsMailcowDeleteAppPassword: (id: string) => Promise<any>;
+        settingsMailcowUpdateUserAcl: (aclJson: string) => Promise<any>;
+        // Updater
+        checkForUpdates: () => Promise<UpdateInfo>;
+        getAppVersion: () => Promise<string>;
+        // Multi-account
+        getAccounts: () => Promise<{ email: string; host: string; label?: string }[]>;
+        saveAccount: (account: { email: string; password: string; host: string; label?: string }) => Promise<void>;
+        removeAccount: (params: { email: string; host: string }) => Promise<void>;
+        switchAccount: (params: { email: string; host: string }) => Promise<void>;
     };
 }

@@ -1,13 +1,13 @@
 import { DAVCalendar, DAVClient, DAVCalendarObject } from 'tsdav';
 import { getCredentials } from './storage.js';
 
-let davClient: DAVClient;
-
-// ─── Connection ───────────────────────────────────────────────────────────────
-
-export const createConn = async () => {
+async function getLoggedCalDavClient(): Promise<DAVClient> {
     const credentials = await getCredentials();
-    davClient = new DAVClient({
+    if (!credentials?.host || !credentials?.email || !credentials?.password) {
+        throw new Error('Missing CalDAV credentials');
+    }
+
+    const client = new DAVClient({
         serverUrl: `https://${credentials.host}/`,
         credentials: {
             username: credentials.email,
@@ -16,13 +16,22 @@ export const createConn = async () => {
         authMethod: 'Basic',
         defaultAccountType: 'caldav',
     });
+
+    await client.login();
+    return client;
+}
+
+// ─── Connection ───────────────────────────────────────────────────────────────
+
+export const createConn = async () => {
+    await getLoggedCalDavClient();
 };
 
 // ─── Calendars ────────────────────────────────────────────────────────────────
 
 export const getCalendars = async () => {
-    await davClient.login();
-    return await davClient.fetchCalendars();
+    const client = await getLoggedCalDavClient();
+    return await client.fetchCalendars();
 };
 
 export const createCalendar = async (params: {
@@ -30,12 +39,12 @@ export const createCalendar = async (params: {
     color?: string;
     description?: string;
 }): Promise<void> => {
-    await davClient.login();
+    const client = await getLoggedCalDavClient();
     const credentials = await getCredentials();
     const calendarId = generateUUID();
     const calendarUrl = `https://${credentials.host}/SOGo/dav/${encodeURIComponent(credentials.email)}/Calendar/${calendarId}/`;
 
-    await davClient.makeCalendar({
+    await client.makeCalendar({
         url: calendarUrl,
         props: {
             displayname: params.displayName,
@@ -55,8 +64,8 @@ export const queryCalendar = async (params: {
     const startDate = new Date(params.year, params.month, 1).toISOString();
     const endDate = new Date(params.year, params.month + 1, 0, 23, 59, 59).toISOString();
 
-    await davClient.login();
-    const events = await davClient.fetchCalendarObjects({
+    const client = await getLoggedCalDavClient();
+    const events = await client.fetchCalendarObjects({
         calendar: params.calendar,
         filters: [
             {
@@ -89,7 +98,7 @@ export const createEvent = async (params: {
     endDate: string;    // ISO string
     allDay?: boolean;
 }): Promise<void> => {
-    await davClient.login();
+    const client = await getLoggedCalDavClient();
     const uid = generateUUID();
     const icsData = buildICSEvent({
         uid,
@@ -101,7 +110,7 @@ export const createEvent = async (params: {
         allDay: params.allDay ?? false,
     });
 
-    await davClient.createCalendarObject({
+    await client.createCalendarObject({
         calendar: params.calendar,
         filename: `${uid}.ics`,
         iCalString: icsData,
@@ -117,7 +126,7 @@ export const updateEvent = async (params: {
     endDate: string;
     allDay?: boolean;
 }): Promise<void> => {
-    await davClient.login();
+    const client = await getLoggedCalDavClient();
 
     // Extract UID from existing ICS
     const uid = extractUID(params.calendarObject.data ?? '') || generateUUID();
@@ -131,7 +140,7 @@ export const updateEvent = async (params: {
         allDay: params.allDay ?? false,
     });
 
-    await davClient.updateCalendarObject({
+    await client.updateCalendarObject({
         calendarObject: {
             ...params.calendarObject,
             data: icsData,
@@ -140,8 +149,8 @@ export const updateEvent = async (params: {
 };
 
 export const deleteEvent = async (params: { calendarObject: DAVCalendarObject }): Promise<void> => {
-    await davClient.login();
-    await davClient.deleteCalendarObject({ calendarObject: params.calendarObject });
+    const client = await getLoggedCalDavClient();
+    await client.deleteCalendarObject({ calendarObject: params.calendarObject });
 };
 
 // ─── ICS helpers ─────────────────────────────────────────────────────────────

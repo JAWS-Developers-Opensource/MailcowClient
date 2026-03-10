@@ -1,67 +1,130 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
-import './SideBarComponent.css';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useNotification } from '../../contexts/NotificationContext';
+import UILogger from '../../helpers/UILogger';
+import './SideBarComponent.css';
 
-const Sidebar = () => {
+type StoredAccount = { email: string; password: string; host: string; label?: string };
+
+const Sidebar: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
-    const { logout } = useAuth();
+    const { t, language, setLanguage } = useLanguage();
+    const { logout, user } = useAuth();
+    const { addNotification } = useNotification();
     const nav = useNavigate();
     const location = useLocation();
 
-    const go = (path: string) => nav(path);
+    const [showAccountMenu, setShowAccountMenu] = useState(false);
+    const [accounts, setAccounts] = useState<StoredAccount[]>([]);
+
     const isActive = (path: string) => location.pathname.startsWith(path);
 
+    useEffect(() => {
+        window.electron.getAccounts?.()
+            .then(setAccounts)
+            .catch((e) => UILogger.error('Sidebar', 'Failed to load accounts', e));
+    }, []);
+
+    const handleSwitch = async (acc: StoredAccount) => {
+        await window.electron.switchAccount?.(acc);
+        window.location.reload();
+    };
+
+    const navItems = [
+        { path: '/mail',     icon: '📧', label: t('nav.mail') },
+        { path: '/calendar', icon: '📅', label: t('nav.calendar') },
+        { path: '/contacts', icon: '👥', label: t('nav.contacts') },
+        { path: '/settings', icon: '⚙️', label: t('nav.settings') },
+    ];
+
     return (
-        <div className="sidebar">
-            <div className="sidebar-menu">
-                <div className="sidebar-item-group">
-                    <button
-                        onClick={() => go('/mail')}
-                        className={`sidebar-item${isActive('/mail') ? ' active' : ''}`}
-                        title="Mail"
-                    >
-                        📧
-                    </button>
-                </div>
-                <div className="sidebar-item-group">
-                    <button
-                        onClick={() => go('/calendar')}
-                        className={`sidebar-item${isActive('/calendar') ? ' active' : ''}`}
-                        title="Calendar"
-                    >
-                        📅
-                    </button>
-                </div>
-                <div className="sidebar-item-group">
-                    <button
-                        onClick={() => go('/contacts')}
-                        className={`sidebar-item${isActive('/contacts') ? ' active' : ''}`}
-                        title="Contacts"
-                    >
-                        👥
-                    </button>
-                </div>
-                <div className="sidebar-item-group">
-                    <button
-                        onClick={() => go('/settings')}
-                        className={`sidebar-item${isActive('/settings') ? ' active' : ''}`}
-                        title="Settings"
-                    >
-                        ⚙️
-                    </button>
-                </div>
+        <nav className="sidebar">
+            {/* App logo / brand */}
+            <div className="sidebar-brand">
+                <span className="sidebar-brand-icon">🐄</span>
             </div>
+
+            {/* Main navigation */}
+            <div className="sidebar-nav">
+                {navItems.map((item) => (
+                    <button
+                        key={item.path}
+                        onClick={() => nav(item.path)}
+                        className={`sidebar-nav-item${isActive(item.path) ? ' sidebar-nav-item--active' : ''}`}
+                        title={item.label}
+                    >
+                        <span className="sidebar-nav-icon">{item.icon}</span>
+                        <span className="sidebar-nav-label">{item.label}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Footer actions */}
             <div className="sidebar-footer">
-                <button className="sidebar-item" onClick={toggleTheme} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
+                {/* Theme toggle */}
+                <button
+                    className="sidebar-footer-btn"
+                    onClick={toggleTheme}
+                    title={theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+                >
                     {theme === 'dark' ? '🌞' : '🌙'}
                 </button>
-                <button className="sidebar-item" onClick={logout} title="Sign out">
-                    🚪
-                </button>
+
+                {/* Language selector */}
+                <div className="sidebar-lang-wrapper" title={t('settings.language')}>
+                    <select
+                        className="sidebar-lang-select"
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value as any)}
+                    >
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="it">🇮🇹 IT</option>
+                        <option value="de">🇩🇪 DE</option>
+                    </select>
+                </div>
+
+                {/* Account switcher */}
+                <div className="sidebar-account-wrapper">
+                    <button
+                        className="sidebar-footer-btn sidebar-account-btn"
+                        onClick={() => setShowAccountMenu(!showAccountMenu)}
+                        title={t('nav.accounts')}
+                    >
+                        <span className="sidebar-avatar">
+                            {user?.email ? user.email[0].toUpperCase() : '?'}
+                        </span>
+                    </button>
+                    {showAccountMenu && (
+                        <div className="sidebar-account-menu">
+                            <div className="sidebar-account-current">
+                                <div className="sidebar-account-email">{user?.email}</div>
+                                <div className="sidebar-account-host">{user?.email?.split('@')[1]}</div>
+                            </div>
+                            {accounts.filter((a) => a.email !== user?.email).map((acc) => (
+                                <button
+                                    key={acc.email + acc.host}
+                                    className="sidebar-account-item"
+                                    onClick={() => handleSwitch(acc)}
+                                >
+                                    <span className="sidebar-account-item-avatar">{acc.email[0].toUpperCase()}</span>
+                                    <span className="sidebar-account-item-email">{acc.email}</span>
+                                </button>
+                            ))}
+                            <button className="sidebar-account-add" onClick={() => nav('/auth')}>
+                                + {t('nav.addAccount')}
+                            </button>
+                            <div className="sidebar-account-divider" />
+                            <button className="sidebar-account-logout" onClick={logout}>
+                                🚪 {t('nav.logout')}
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </nav>
     );
 };
 

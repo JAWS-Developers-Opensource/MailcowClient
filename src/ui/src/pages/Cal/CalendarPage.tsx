@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './CalendarPage.css';
@@ -8,11 +8,13 @@ import { DAVCalendar, DAVCalendarObject } from 'tsdav';
 import { useLoading } from '../../contexts/LoadingContext';
 import { ReactEventType } from '../../types/calendar.types';
 import { useCalContext } from '../../contexts/cal/CalContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import UILogger from '../../helpers/UILogger';
 import NewEventComponent from '../../components/cal/NewEventComponent';
 import { useNotification } from '../../contexts/NotificationContext';
+import { FiRefreshCw, FiPlus } from 'react-icons/fi';
 
 const localizer = momentLocalizer(moment);
-
 moment.locale('it-it', { week: { dow: 1 } });
 
 const EMPTY_EVENT = {
@@ -30,23 +32,30 @@ const EMPTY_EVENT = {
 type RichEvent = ReactEventType & {
     calendarObject?: DAVCalendarObject;
     calendarIndex?: number;
+    description?: string;
+    location?: string;
 };
 
 const CalendarPage: React.FC = () => {
     const { setLoadingStatus, loading } = useLoading();
-    const { calendars } = useCalContext();
+    const { calendars, updateTriggers } = useCalContext();
     const { addNotification } = useNotification();
+    const { t } = useLanguage();
 
     const [events, setEvents] = useState<RichEvent[]>([]);
     const [calEvents, setCalEvents] = useState<{ calendar: DAVCalendar; events: RichEvent[] }[]>([]);
     const [allCalendars, setAllCalendars] = useState<DAVCalendar[]>([]);
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [currentView, setCurrentView] = useState<string>(Views.MONTH);
 
     // ── Event form state ──────────────────────────────────────────────────────
     const [showForm, setShowForm] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingObject, setEditingObject] = useState<DAVCalendarObject | null>(null);
     const [newEvent, setNewEvent] = useState({ ...EMPTY_EVENT });
+
+    // ── Selected event detail ─────────────────────────────────────────────────
+    const [selectedEvent, setSelectedEvent] = useState<RichEvent | null>(null);
 
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -56,7 +65,6 @@ const CalendarPage: React.FC = () => {
         setCalEvents([]);
 
         try {
-            await window.electron.calCreateConn();
             const cals = await window.electron.calGetCalendars();
             setAllCalendars(cals);
             calendars.setCalendars(cals);
@@ -83,6 +91,7 @@ const CalendarPage: React.FC = () => {
                                     end: event.endDate.toJSDate(),
                                     allDay: event.startDate.isDate,
                                     description: event.description || '',
+                                    location: event.location || '',
                                     color: calendarColors[String(cal.displayName)] || '#808080',
                                     calendarObject: entry,
                                     calendarIndex: cals.indexOf(cal),
@@ -96,15 +105,13 @@ const CalendarPage: React.FC = () => {
 
             setCalEvents(all);
         } catch (e: any) {
-            addNotification("Calendar", `Failed to load events: ${e.message}`, 'error');
+            addNotification('Calendar', `Failed to load events: ${e.message}`, 'error');
         } finally {
             setLoadingStatus(false);
         }
     }, [currentDate, addNotification]);
 
-    useEffect(() => {
-        loadEvents();
-    }, []);
+    useEffect(() => { loadEvents(); }, []);
 
     useEffect(() => {
         const visible = calEvents
@@ -113,17 +120,15 @@ const CalendarPage: React.FC = () => {
             })
             .flatMap((c) => c.events);
         setEvents(visible);
-    }, [calendars, calEvents]);
+    }, [calEvents, updateTriggers.calendars]);
 
     // ── Navigate ──────────────────────────────────────────────────────────────
-
     const handleNavigate = (date: Date) => {
         setCurrentDate(date);
         loadEvents(date);
     };
 
     // ── Slot select (new event) ───────────────────────────────────────────────
-
     const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
         const fmt = (d: Date) => d.toISOString().split('T')[0];
         const fmtTime = (d: Date) => d.toTimeString().slice(0, 5);
@@ -138,18 +143,23 @@ const CalendarPage: React.FC = () => {
         });
         setIsEditMode(false);
         setEditingObject(null);
+        setSelectedEvent(null);
         setShowForm(true);
     };
 
-    // ── Event click (edit) ────────────────────────────────────────────────────
-
+    // ── Event click ───────────────────────────────────────────────────────────
     const handleSelectEvent = (event: RichEvent) => {
+        setSelectedEvent(event);
+    };
+
+    // ── Open edit form from detail ────────────────────────────────────────────
+    const handleEditEvent = (event: RichEvent) => {
         const fmt = (d: Date) => d.toISOString().split('T')[0];
         const fmtTime = (d: Date) => d.toTimeString().slice(0, 5);
         setNewEvent({
             title: event.title,
             description: event.description ?? '',
-            location: '',
+            location: event.location ?? '',
             startDate: fmt(event.start),
             startTime: fmtTime(event.start),
             endDate: fmt(event.end),
@@ -159,18 +169,18 @@ const CalendarPage: React.FC = () => {
         });
         setIsEditMode(true);
         setEditingObject(event.calendarObject ?? null);
+        setSelectedEvent(null);
         setShowForm(true);
     };
 
     // ── Save event ────────────────────────────────────────────────────────────
-
     const handleSaveEvent = async () => {
         if (!newEvent.title.trim()) {
-            addNotification("Calendar", 'Please enter an event title.', 'error');
+            addNotification(t('cal.title'), 'Please enter an event title.', 'error');
             return;
         }
         if (!newEvent.startDate) {
-            addNotification("", 'Please enter a start date.', 'error');
+            addNotification('', 'Please enter a start date.', 'error');
             return;
         }
 
@@ -192,10 +202,10 @@ const CalendarPage: React.FC = () => {
                     endDate: endISO,
                     allDay: newEvent.allDay,
                 });
-                addNotification("Calendar", 'Event updated!', 'success');
+                addNotification('Calendar', 'Event updated!', 'success');
             } else {
                 const calendar = allCalendars[newEvent.calendarIndex];
-                if (!calendar) { addNotification("Calendar", 'No calendar selected.', 'error'); return; }
+                if (!calendar) { addNotification('Calendar', 'No calendar selected.', 'error'); return; }
                 await window.electron.calCreateEvent({
                     calendar,
                     title: newEvent.title,
@@ -205,43 +215,151 @@ const CalendarPage: React.FC = () => {
                     endDate: endISO,
                     allDay: newEvent.allDay,
                 });
-                addNotification("Calendar", 'Event created!', 'success');
+                addNotification('Calendar', 'Event created!', 'success');
             }
             setShowForm(false);
             loadEvents();
         } catch (e: any) {
-            addNotification("Calendar", `Failed to save event: ${e.message}`, 'error');
+            addNotification('Calendar', `Failed to save event: ${e.message}`, 'error');
         }
     };
 
     // ── Delete event ──────────────────────────────────────────────────────────
-
-    const handleDeleteEvent = async () => {
-        if (!editingObject) return;
+    const handleDeleteEvent = async (obj?: DAVCalendarObject | null) => {
+        const target = obj ?? editingObject;
+        if (!target) return;
         try {
-            await window.electron.calDeleteEvent(editingObject);
-            addNotification("Calendar", 'Event deleted.', 'success');
+            await window.electron.calDeleteEvent(target);
+            addNotification('', t('cal.deleted'), 'success');
             setShowForm(false);
+            setSelectedEvent(null);
             loadEvents();
         } catch (e: any) {
-            addNotification("", `Failed to delete: ${e.message}`, 'error');
+            addNotification('', `Failed to delete: ${e.message}`, 'error');
         }
     };
 
     const eventStyleGetter = (event: any) => ({
         style: {
-            backgroundColor: event.color,
-            borderRadius: '4px',
-            opacity: 0.85,
+            backgroundColor: event.color || 'var(--primary-color, #007bff)',
+            borderRadius: '5px',
             color: '#fff',
-            border: '0',
+            border: 'none',
+            fontSize: '0.8rem',
+            padding: '2px 6px',
         },
     });
 
-    if (loading) return <></>;
+    const todayEvents = events.filter((e) => {
+        const today = new Date();
+        return e.start.toDateString() === today.toDateString();
+    });
+
+    if (loading) return <div className="cal-loading">Loading…</div>;
 
     return (
-        <div className="calendar-container">
+        <div className="calendar-page">
+            {/* ── Toolbar ───────────────────────────────────────────── */}
+            <div className="cal-toolbar">
+                <div className="cal-toolbar-left">
+                    <button className="cal-new-btn" onClick={() => {
+                        const now = new Date();
+                        const fmt = (d: Date) => d.toISOString().split('T')[0];
+                        setNewEvent({ ...EMPTY_EVENT, startDate: fmt(now), endDate: fmt(now) });
+                        setIsEditMode(false);
+                        setEditingObject(null);
+                        setSelectedEvent(null);
+                        setShowForm(true);
+                    }}>
+                        <FiPlus size={14} /> New Event
+                    </button>
+                </div>
+                <div className="cal-toolbar-center">
+                    <span className="cal-today-badge">
+                        {todayEvents.length > 0
+                            ? `${todayEvents.length} event${todayEvents.length > 1 ? 's' : ''} today`
+                            : 'No events today'}
+                    </span>
+                </div>
+                <div className="cal-toolbar-right">
+                    <button className="cal-icon-btn" onClick={() => loadEvents()} title="Refresh">
+                        <FiRefreshCw size={14} />
+                    </button>
+                </div>
+            </div>
+
+            {/* ── Calendar ──────────────────────────────────────────── */}
+            <div className="cal-body">
+                <Calendar
+                    localizer={localizer}
+                    events={events}
+                    startAccessor="start"
+                    endAccessor="end"
+                    selectable
+                    style={{ flex: 1 }}
+                    eventPropGetter={eventStyleGetter}
+                    onSelectSlot={handleSelectSlot}
+                    onSelectEvent={handleSelectEvent}
+                    date={currentDate}
+                    onNavigate={handleNavigate}
+                    view={currentView as any}
+                    onView={setCurrentView}
+                    views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
+                    popup
+                    tooltipAccessor={(e: any) => e.description || e.title}
+                />
+            </div>
+
+            {/* ── Event detail popup ────────────────────────────────── */}
+            {selectedEvent && (
+                <div className="event-detail-overlay" onClick={() => setSelectedEvent(null)}>
+                    <div className="event-detail-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="event-detail-color-strip" style={{ background: selectedEvent.color }} />
+                        <div className="event-detail-content">
+                            <h3 className="event-detail-title">{selectedEvent.title}</h3>
+                            <div className="event-detail-row">
+                                <span className="event-detail-icon">🕐</span>
+                                <span>
+                                    {moment(selectedEvent.start).format('ddd D MMM YYYY')}
+                                    {!selectedEvent.allDay && (
+                                        <> — {moment(selectedEvent.start).format('HH:mm')} → {moment(selectedEvent.end).format('HH:mm')}</>
+                                    )}
+                                </span>
+                            </div>
+                            {selectedEvent.location && (
+                                <div className="event-detail-row">
+                                    <span className="event-detail-icon">📍</span>
+                                    <span>{selectedEvent.location}</span>
+                                </div>
+                            )}
+                            {selectedEvent.description && (
+                                <div className="event-detail-row">
+                                    <span className="event-detail-icon">📝</span>
+                                    <span className="event-detail-desc">{selectedEvent.description}</span>
+                                </div>
+                            )}
+                            <div className="event-detail-actions">
+                                <button className="event-detail-edit-btn" onClick={() => handleEditEvent(selectedEvent)}>
+                                    ✏ Edit
+                                </button>
+                                {selectedEvent.calendarObject && (
+                                    <button
+                                        className="event-detail-delete-btn"
+                                        onClick={() => handleDeleteEvent(selectedEvent.calendarObject)}
+                                    >
+                                        🗑 Delete
+                                    </button>
+                                )}
+                                <button className="event-detail-close-btn" onClick={() => setSelectedEvent(null)}>
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── New/edit event form ───────────────────────────────── */}
             {showForm && (
                 <NewEventComponent
                     newEvent={newEvent}
@@ -250,30 +368,9 @@ const CalendarPage: React.FC = () => {
                     closePopup={() => setShowForm(false)}
                     calendars={allCalendars}
                     isEdit={isEditMode}
+                    onDelete={isEditMode && editingObject ? () => handleDeleteEvent(editingObject) : undefined}
                 />
             )}
-
-            {isEditMode && showForm && editingObject && (
-                <div className="event-delete-bar">
-                    <button className="event-delete-btn" onClick={handleDeleteEvent}>
-                        🗑 Delete Event
-                    </button>
-                </div>
-            )}
-
-            <Calendar
-                localizer={localizer}
-                events={events}
-                startAccessor="start"
-                endAccessor="end"
-                selectable
-                style={{ margin: '10px', flex: 1 }}
-                eventPropGetter={eventStyleGetter}
-                onSelectSlot={handleSelectSlot}
-                onSelectEvent={handleSelectEvent}
-                date={currentDate}
-                onNavigate={handleNavigate}
-            />
         </div>
     );
 };

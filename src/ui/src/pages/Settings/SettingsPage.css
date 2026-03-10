@@ -40,6 +40,7 @@
 .settings-row {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 14px;
     padding: 8px 0;
 }
@@ -104,6 +105,7 @@
 
 .settings-input {
     flex: 1;
+    min-width: 180px;
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -129,6 +131,14 @@
 }
 
 .settings-save-btn:hover { opacity: 0.85; }
+
+.settings-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-color, #444);
+}
 
 .settings-fetch-btn {
     padding: 8px 14px;
@@ -192,4 +202,40 @@
     color: var(--text-color, #444);
     padding: 4px 0;
     border-bottom: 1px solid #f0f0f0;
+}
+
+.alias-item--action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.settings-inline-danger {
+    border: 1px solid #e57373;
+    background: transparent;
+    color: #c62828;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+.settings-inline-danger:hover {
+    background: #ffebee;
+}
+
+.settings-textarea {
+    width: 100%;
+    min-height: 180px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    resize: vertical;
+    background: #fff;
+    color: #222;
+    margin: 8px 0 12px 0;
 }
