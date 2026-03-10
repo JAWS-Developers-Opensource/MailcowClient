@@ -13,6 +13,7 @@ import { ContactStack } from './src/navigate/ContactStack'
 import SettingsPage from './src/pages/Settings/SettingsPage'
 import { useState, useEffect } from 'react'
 import UpdateModal from './src/components/frame/UpdateModal'
+import LanguageProvider from './src/contexts/LanguageContext'
 
 
 function App() {
@@ -33,43 +34,45 @@ function App() {
   return (
     <HashRouter>
       <ThemeProvider>
-        <VarsPorvider>
-          <NotificationProvider>
-            <LoadingProvider>
-              <AuthProvider>
-                {updateInfo && (
-                  <UpdateModal
-                    currentVersion={updateInfo.currentVersion}
-                    latestVersion={updateInfo.latestVersion}
-                    releaseName={updateInfo.releaseName}
-                    releaseNotes={updateInfo.releaseNotes}
-                    releaseUrl={updateInfo.releaseUrl}
-                    onDismiss={() => setUpdateInfo(null)}
-                  />
-                )}
-                <Routes>
-                  <Route path='/auth' element={<LoginPage />} />
-                  <Route
-                    path="*"
-                    element={
-                      <RequireAuth>
-                        <MainFrameComponent>
-                          <Routes>
-                            <Route path='*' element={<Navigate to="/mail" replace />} />
-                            <Route path='/mail' element={<MailStack />} />
-                            <Route path='/calendar' element={<CalendarStack />} />
-                            <Route path='/contacts' element={<ContactStack />} />
-                            <Route path='/settings' element={<SettingsPage />} />
-                          </Routes>
-                        </MainFrameComponent>
-                      </RequireAuth>
-                    }
-                  />
-                </Routes>
-              </AuthProvider>
-            </LoadingProvider>
-          </NotificationProvider>
-        </VarsPorvider>
+        <LanguageProvider>
+          <VarsPorvider>
+            <NotificationProvider>
+              <LoadingProvider>
+                <AuthProvider>
+                  {updateInfo && (
+                    <UpdateModal
+                      currentVersion={updateInfo.currentVersion}
+                      latestVersion={updateInfo.latestVersion}
+                      releaseName={updateInfo.releaseName}
+                      releaseNotes={updateInfo.releaseNotes}
+                      releaseUrl={updateInfo.releaseUrl}
+                      onDismiss={() => setUpdateInfo(null)}
+                    />
+                  )}
+                  <Routes>
+                    <Route path='/auth' element={<LoginPage />} />
+                    <Route
+                      path="*"
+                      element={
+                        <RequireAuth>
+                          <MainFrameComponent>
+                            <Routes>
+                              <Route path='*' element={<Navigate to="/mail" replace />} />
+                              <Route path='/mail' element={<MailStack />} />
+                              <Route path='/calendar' element={<CalendarStack />} />
+                              <Route path='/contacts' element={<ContactStack />} />
+                              <Route path='/settings' element={<SettingsPage />} />
+                            </Routes>
+                          </MainFrameComponent>
+                        </RequireAuth>
+                      }
+                    />
+                  </Routes>
+                </AuthProvider>
+              </LoadingProvider>
+            </NotificationProvider>
+          </VarsPorvider>
+        </LanguageProvider>
       </ThemeProvider>
     </HashRouter>
   )

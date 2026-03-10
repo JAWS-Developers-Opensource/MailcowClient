@@ -172,6 +172,11 @@ type EventPayloadMapping = {
     // Updater
     checkForUpdates: UpdateInfo;
     getAppVersion: string;
+    // Multi-account
+    getAccounts: { email: string; password: string; host: string; label?: string }[];
+    saveAccount: void;
+    removeAccount: void;
+    switchAccount: void;
 };
 
 // ─── Window.electron interface ────────────────────────────────────────────────
@@ -265,5 +270,10 @@ interface Window {
         // Updater
         checkForUpdates: () => Promise<UpdateInfo>;
         getAppVersion: () => Promise<string>;
+        // Multi-account
+        getAccounts: () => Promise<{ email: string; password: string; host: string; label?: string }[]>;
+        saveAccount: (account: { email: string; password: string; host: string; label?: string }) => Promise<void>;
+        removeAccount: (params: { email: string; host: string }) => Promise<void>;
+        switchAccount: (params: { email: string; host: string }) => Promise<void>;
     };
 }

@@ -1,21 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './SelectedEmailComponent.css';
 import { ImapEmailBody } from '../../types/mail.types';
 import ComposeEmailComponent from './ComposeEmailComponent';
-import { FiCornerUpLeft, FiCornerUpRight, FiTrash2 } from 'react-icons/fi';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { useNotification } from '../../contexts/NotificationContext';
+import {
+    FiCornerUpLeft, FiCornerUpRight, FiTrash2,
+    FiMoreHorizontal, FiEye, FiEyeOff, FiFolderPlus, FiDownload,
+} from 'react-icons/fi';
+import UILogger from '../../helpers/UILogger';
 
-const SelectedEmailComponent = ({ email, onDelete }: { email: ImapEmailBody; onDelete?: () => void }) => {
-    const [showReply, setShowReply] = useState(false);
-    const [showForward, setShowForward] = useState(false);
+interface Props {
+    email: ImapEmailBody;
+    onDelete?: () => void;
+    onMove?: (toFolder: string) => void;
+    onMarkUnread?: () => void;
+    folders?: string[];
+    folder?: string;
+}
 
-    const replySubject = email.subject?.startsWith('Re:') ? email.subject : `Re: ${email.subject ?? ''}`;
-    const fwdSubject = email.subject?.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject ?? ''}`;
+// Block remote images by replacing src in HTML
+function blockRemoteImages(html: string): string {
+    return html
+        .replace(/(src=")https?:\/\//gi, '$1data:blocked,')
+        .replace(/(background(?:-image)?:\s*url\(['"]?)https?:\/\//gi, '$1data:blocked,');
+}
+
+const SelectedEmailComponent: React.FC<Props> = ({
+    email, onDelete, onMove, onMarkUnread, folders = [], folder,
+}) => {
+    const { t } = useLanguage();
+    const { addNotification } = useNotification();
+
+    const [showReply, setShowReply]       = useState(false);
+    const [showForward, setShowForward]   = useState(false);
+    const [showMore, setShowMore]         = useState(false);
+    const [showMoveMenu, setShowMoveMenu] = useState(false);
+    const [imagesAllowed, setImagesAllowed] = useState(false);
+
+    const replySubject = email.subject?.startsWith('Re:')  ? email.subject : `Re: ${email.subject ?? ''}`;
+    const fwdSubject   = email.subject?.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject ?? ''}`;
     const fwdBody = `<br><br><hr style="border:none;border-top:1px solid #e0e0e0"/>`
         + `<p style="color:#777;font-size:0.88em">`
         + `<strong>From:</strong> ${email.from ?? ''}<br>`
         + `<strong>Date:</strong> ${email.date ?? ''}<br>`
         + `<strong>Subject:</strong> ${email.subject ?? ''}</p>`
         + (email.bodyHtml ?? `<pre>${email.bodyText ?? ''}</pre>`);
+
+    // Detect if email HTML contains remote images
+    const hasRemoteImages = useMemo(() =>
+        !!(email.bodyHtml && /src=["']https?:\/\//i.test(email.bodyHtml)),
+        [email.bodyHtml],
+    );
+
+    const processedHtml = useMemo(() => {
+        if (!email.bodyHtml) return '';
+        return imagesAllowed ? email.bodyHtml : blockRemoteImages(email.bodyHtml);
+    }, [email.bodyHtml, imagesAllowed]);
+
+    const handleMove = (toFolder: string) => {
+        setShowMoveMenu(false);
+        setShowMore(false);
+        onMove?.(toFolder);
+        UILogger.info('SelectedEmail', `Moving email to ${toFolder}`);
+    };
+
+    const handleMarkUnread = () => {
+        setShowMore(false);
+        onMarkUnread?.();
+    };
 
     return (
         <div className="selected-email">
@@ -34,20 +87,76 @@ const SelectedEmailComponent = ({ email, onDelete }: { email: ImapEmailBody; onD
                 />
             )}
 
+            {/* ── Toolbar ────────────────────────────────────────── */}
             <div className="selected-email-toolbar">
                 <button className="email-action-btn" onClick={() => setShowReply(true)}>
-                    <FiCornerUpLeft size={13} /> Reply
+                    <FiCornerUpLeft size={13} /> {t('mail.reply')}
                 </button>
                 <button className="email-action-btn" onClick={() => setShowForward(true)}>
-                    <FiCornerUpRight size={13} /> Forward
+                    <FiCornerUpRight size={13} /> {t('mail.forward')}
                 </button>
                 {onDelete && (
                     <button className="email-action-btn email-action-btn--danger" onClick={onDelete}>
-                        <FiTrash2 size={13} /> Delete
+                        <FiTrash2 size={13} /> {t('mail.delete')}
                     </button>
                 )}
+
+                {/* More actions */}
+                <div className="email-more-wrapper">
+                    <button
+                        className="email-action-btn email-action-btn--icon"
+                        onClick={() => { setShowMore(!showMore); setShowMoveMenu(false); }}
+                        title="More actions"
+                    >
+                        <FiMoreHorizontal size={14} />
+                    </button>
+                    {showMore && (
+                        <div className="email-more-menu">
+                            {onMarkUnread && (
+                                <button className="email-more-item" onClick={handleMarkUnread}>
+                                    <FiEyeOff size={13} /> {t('mail.markUnread')}
+                                </button>
+                            )}
+                            {onMove && folders.length > 0 && (
+                                <div className="email-more-item email-more-item--submenu"
+                                    onMouseEnter={() => setShowMoveMenu(true)}
+                                    onMouseLeave={() => setShowMoveMenu(false)}
+                                >
+                                    <FiFolderPlus size={13} /> {t('mail.moveTo')}
+                                    {showMoveMenu && (
+                                        <div className="email-move-submenu">
+                                            {folders.filter((f) => f !== folder).slice(0, 20).map((f) => (
+                                                <button
+                                                    key={f}
+                                                    className="email-more-item"
+                                                    onClick={() => handleMove(f)}
+                                                >
+                                                    {f.split(/[./]/).pop()}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
 
+            {/* ── Remote images notice ───────────────────────────── */}
+            {hasRemoteImages && !imagesAllowed && (
+                <div className="remote-images-bar">
+                    <span>{t('mail.imagesBlocked')}</span>
+                    <button
+                        className="remote-images-btn"
+                        onClick={() => setImagesAllowed(true)}
+                    >
+                        <FiDownload size={12} /> {t('mail.loadImages')}
+                    </button>
+                </div>
+            )}
+
+            {/* ── Header ─────────────────────────────────────────── */}
             <div className="selected-email-header">
                 <h2 className="selected-email-subject">{email.subject}</h2>
                 <div className="selected-email-meta">
@@ -57,11 +166,12 @@ const SelectedEmailComponent = ({ email, onDelete }: { email: ImapEmailBody; onD
                 </div>
             </div>
 
+            {/* ── Body ───────────────────────────────────────────── */}
             <div className="selected-email-body">
                 {email.bodyHtml ? (
                     <iframe
                         className="email-iframe"
-                        srcDoc={email.bodyHtml}
+                        srcDoc={processedHtml}
                         sandbox=""
                         title="Email body"
                     />

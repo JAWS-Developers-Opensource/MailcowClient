@@ -48,6 +48,11 @@ contextBridge.exposeInMainWorld('electron', {
   // Updater
   checkForUpdates: () => ipcInvoke('checkForUpdates'),
   getAppVersion: () => ipcInvoke('getAppVersion'),
+  // Multi-account
+  getAccounts: () => ipcInvoke('getAccounts'),
+  saveAccount: (account) => ipcInvoke('saveAccount', account),
+  removeAccount: (params) => ipcInvoke('removeAccount', params),
+  switchAccount: (params) => ipcInvoke('switchAccount', params),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

@@ -220,3 +220,39 @@
     font-size: 0.95rem;
     font-weight: 500;
 }
+
+/* ── Conversation grouping ────────────────────────────────────────────────── */
+.conversation-group {
+    border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.05));
+}
+
+.email-item--nested {
+    padding-left: 20px !important;
+    background: var(--hover-background-color, #f8fafc) !important;
+    font-size: 0.9em;
+    border-left: 3px solid transparent;
+}
+
+.email-item--nested:hover {
+    background: var(--hover-background-color, #eef4ff) !important;
+}
+
+.conv-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color, #6366f1);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.email-list-empty {
+    padding: 40px;
+    text-align: center;
+    color: #a0aec0;
+    font-size: 0.88rem;
+}

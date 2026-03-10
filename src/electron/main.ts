@@ -8,6 +8,7 @@ import {
     getCredentials, removeCredentials, saveCredentials,
     getOAuth2Credentials, removeOAuth2Credentials, saveOAuth2Credentials,
     saveApiKey, getApiKey,
+    getAccounts, saveAccount, removeAccount, switchAccount,
 } from './storage.js';
 import { createConn, getCalendars, queryCalendar, createEvent, updateEvent, deleteEvent, createCalendar } from './caldav.js';
 import { createCardDavConn, fetchAddressBooks, fetchContacts, createContact, updateContact, deleteContact } from './carddav.js';
@@ -21,8 +22,10 @@ import {
     mailcowDeleteAppPassword,
     mailcowUpdateUserAcl,
 } from './mailcow.js';
+import Logger from './helpers/Logger.js';
 
 app.on('ready', () => {
+    Logger.info('App ready — launching MailcowClient');
     const mainWindow = new BrowserWindow({
         webPreferences: {
             preload: getPreloadPath(),
@@ -111,6 +114,13 @@ app.on('ready', () => {
     ipcHandle('checkForUpdates', checkForUpdates);
     ipcHandle('getAppVersion', async () => getAppVersion());
 
+    // Multi-account
+    ipcHandle('getAccounts', getAccounts);
+    ipcHandle('saveAccount', saveAccount);
+    ipcHandle('removeAccount', removeAccount);
+    ipcHandle('switchAccount', switchAccount);
+
+    Logger.info('All IPC handlers registered');
     handleCloseEvents(mainWindow);
 });
 

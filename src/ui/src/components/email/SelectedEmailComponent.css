@@ -9,26 +9,29 @@
 /* ── Toolbar ─────────────────────────────────────────────────────────────── */
 .selected-email-toolbar {
     display: flex;
+    align-items: center;
     gap: 6px;
     padding: 10px 16px;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
     background: var(--sidebar-background-color, #f8fafc);
     flex-shrink: 0;
+    flex-wrap: wrap;
 }
 
 .email-action-btn {
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 6px 14px;
-    border: 1px solid #d1d5db;
-    background: var(--sidebar-background-color, #fff);
+    padding: 6px 12px;
+    border: 1px solid var(--border-color, #d1d5db);
+    background: var(--card-bg, #fff);
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.84rem;
+    font-size: 0.83rem;
     font-weight: 500;
     color: var(--text-color, #4a5568);
     transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
 }
 
 .email-action-btn:hover {
@@ -46,16 +49,112 @@
     border-color: #ef4444;
 }
 
+.email-action-btn--icon {
+    padding: 6px 8px;
+}
+
+/* ── More menu ───────────────────────────────────────────────────────────── */
+.email-more-wrapper {
+    position: relative;
+    margin-left: auto;
+}
+
+.email-more-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    min-width: 180px;
+    padding: 6px;
+    z-index: 200;
+    animation: menuIn 0.15s ease-out;
+}
+
+@keyframes menuIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.email-more-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 0.83rem;
+    color: var(--text-color, #374151);
+    text-align: left;
+    transition: background 0.12s;
+    position: relative;
+}
+
+.email-more-item:hover { background: var(--hover-background-color, #f1f5f9); }
+
+.email-more-item--submenu { cursor: default; }
+
+/* ── Move submenu ────────────────────────────────────────────────────────── */
+.email-move-submenu {
+    position: absolute;
+    left: calc(100% + 4px);
+    top: 0;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    min-width: 160px;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 6px;
+    z-index: 201;
+}
+
+/* ── Remote images bar ───────────────────────────────────────────────────── */
+.remote-images-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #fefce8;
+    border-bottom: 1px solid #fde68a;
+    font-size: 0.82rem;
+    color: #92400e;
+    flex-shrink: 0;
+}
+
+.remote-images-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #f59e0b;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.remote-images-btn:hover { opacity: 0.85; }
+
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .selected-email-header {
     padding: 18px 20px 14px;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
     flex-shrink: 0;
 }
 
 .selected-email-subject {
     margin: 0 0 12px 0;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-color, #1a202c);
     line-height: 1.4;
@@ -79,8 +178,8 @@
     min-width: 36px;
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
     color: #94a3b8;
 }
 
@@ -88,7 +187,6 @@
 .selected-email-body {
     flex: 1;
     overflow: auto;
-    padding: 0;
 }
 
 .email-iframe {

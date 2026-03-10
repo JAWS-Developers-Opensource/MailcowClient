@@ -4,6 +4,7 @@ import { useLoading } from '../../contexts/LoadingContext';
 import './LoginPage.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /** Step within the IMAP flow when auth fails and MFA may be needed. */
 type ImapStep = 'credentials' | 'mfa';
@@ -12,6 +13,7 @@ const LoginPage: React.FC = () => {
     const { login } = useAuth();
     const { addNotification } = useNotification();
     const { loading, setLoadingStatus } = useLoading();
+    const { t } = useLanguage();
 
     // ── IMAP state ────────────────────────────────────────────────────────────
     const [imapStep, setImapStep] = useState<ImapStep>('credentials');
@@ -43,6 +45,7 @@ const LoginPage: React.FC = () => {
             case 'success':
                 addNotification('', 'Welcome back', 'success');
                 window.electron.saveUserCredentials({ email, password, host: resolvedHost });
+                window.electron.saveAccount?.({ email, password, host: resolvedHost });
                 login(email);
                 break;
             case 'credentials':
@@ -69,6 +72,7 @@ const LoginPage: React.FC = () => {
             case 'success':
                 addNotification('', 'Welcome back', 'success');
                 window.electron.saveUserCredentials({ email, password: combinedPassword, host: resolvedHost });
+                window.electron.saveAccount?.({ email, password: combinedPassword, host: resolvedHost });
                 login(email);
                 break;
             case 'credentials':
@@ -96,7 +100,7 @@ const LoginPage: React.FC = () => {
                 <div className="login-logo">
                     <img src="https://avatars.githubusercontent.com/u/23747925?s=280&v=4" alt="Mailcow logo" />
                 </div>
-                <h2 className="login-title">Welcome to Mailcow Client 🐄</h2>
+                <h2 className="login-title">{t('login.title')} 🐄</h2>
 
                 {loading ? (
                     <div className="loading-spinner" />
@@ -106,7 +110,7 @@ const LoginPage: React.FC = () => {
                         {imapStep === 'credentials' && (
                             <form onSubmit={handleImapLogin} className="login-form-fields">
                                 <div className="input-group">
-                                    <label htmlFor="email">Email</label>
+                                    <label htmlFor="email">{t('login.email')}</label>
                                     <input
                                         id="email"
                                         type="email"
@@ -118,11 +122,11 @@ const LoginPage: React.FC = () => {
                                     />
                                 </div>
                                 <div className="input-group">
-                                    <label htmlFor="password">Password</label>
+                                    <label htmlFor="password">{t('login.password')}</label>
                                     <input
                                         id="password"
                                         type="password"
-                                        placeholder="Your password"
+                                        placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
@@ -130,9 +134,9 @@ const LoginPage: React.FC = () => {
                                 </div>
                                 <div className="input-group">
                                     <label htmlFor="host">
-                                        Server host
+                                        {t('login.host')}
                                         {host.default && !host.given && (
-                                            <span className="host-hint"> (auto: {host.default})</span>
+                                            <span className="host-hint"> ({t('login.hostHint')}{host.default})</span>
                                         )}
                                     </label>
                                     <input
@@ -144,7 +148,7 @@ const LoginPage: React.FC = () => {
                                     />
                                 </div>
                                 <button type="submit" className="login-btn" disabled={loading}>
-                                    Sign in
+                                    {t('login.signIn')}
                                 </button>
                             </form>
                         )}
@@ -152,12 +156,9 @@ const LoginPage: React.FC = () => {
                         {/* ── MFA step ──────────────────────────────────────── */}
                         {imapStep === 'mfa' && (
                             <form onSubmit={handleImapMfaLogin} className="login-form-fields">
-                                <p className="mfa-hint">
-                                    If your account has 2FA (TOTP) enabled, enter the 6-digit code from your
-                                    authenticator app.
-                                </p>
+                                <p className="mfa-hint">{t('login.mfaHint')}</p>
                                 <div className="input-group">
-                                    <label htmlFor="totp">TOTP / 2FA Code</label>
+                                    <label htmlFor="totp">{t('login.mfaCode')}</label>
                                     <input
                                         id="totp"
                                         type="text"
@@ -172,14 +173,14 @@ const LoginPage: React.FC = () => {
                                     />
                                 </div>
                                 <button type="submit" className="login-btn" disabled={loading}>
-                                    Verify
+                                    {t('login.verify')}
                                 </button>
                                 <button
                                     type="button"
                                     className="login-btn login-btn-secondary"
                                     onClick={() => setImapStep('credentials')}
                                 >
-                                    ← Back
+                                    {t('login.back')}
                                 </button>
                             </form>
                         )}

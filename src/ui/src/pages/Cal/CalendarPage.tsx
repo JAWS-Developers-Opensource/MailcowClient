@@ -8,6 +8,8 @@ import { DAVCalendar, DAVCalendarObject } from 'tsdav';
 import { useLoading } from '../../contexts/LoadingContext';
 import { ReactEventType } from '../../types/calendar.types';
 import { useCalContext } from '../../contexts/cal/CalContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import UILogger from '../../helpers/UILogger';
 import NewEventComponent from '../../components/cal/NewEventComponent';
 import { useNotification } from '../../contexts/NotificationContext';
 import { FiRefreshCw, FiPlus } from 'react-icons/fi';
@@ -38,6 +40,7 @@ const CalendarPage: React.FC = () => {
     const { setLoadingStatus, loading } = useLoading();
     const { calendars, updateTriggers } = useCalContext();
     const { addNotification } = useNotification();
+    const { t } = useLanguage();
 
     const [events, setEvents] = useState<RichEvent[]>([]);
     const [calEvents, setCalEvents] = useState<{ calendar: DAVCalendar; events: RichEvent[] }[]>([]);
@@ -173,7 +176,7 @@ const CalendarPage: React.FC = () => {
     // ── Save event ────────────────────────────────────────────────────────────
     const handleSaveEvent = async () => {
         if (!newEvent.title.trim()) {
-            addNotification('Calendar', 'Please enter an event title.', 'error');
+            addNotification(t('cal.title'), 'Please enter an event title.', 'error');
             return;
         }
         if (!newEvent.startDate) {
@@ -227,7 +230,7 @@ const CalendarPage: React.FC = () => {
         if (!target) return;
         try {
             await window.electron.calDeleteEvent(target);
-            addNotification('Calendar', 'Event deleted.', 'success');
+            addNotification('', t('cal.deleted'), 'success');
             setShowForm(false);
             setSelectedEvent(null);
             loadEvents();
