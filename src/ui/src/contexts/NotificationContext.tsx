@@ -64,9 +64,10 @@ const NotificationItem: React.FC<{ notif: NotifEntry; onClose: (id: number) => v
 
 const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const [notifications, setNotifications] = useState<NotifEntry[]>([]);
+    const counterRef = useRef(0);
 
     const addNotification = (title: string, message: string, type: 'success' | 'error' | 'info') => {
-        const id = Date.now() + Math.random();
+        const id = ++counterRef.current;
         setNotifications((prev) => [...prev.slice(-4), { id, title, message, type, createdAt: Date.now() }]);
     };
 

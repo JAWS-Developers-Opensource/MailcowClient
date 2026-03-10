@@ -19,7 +19,11 @@ interface Props {
     folder?: string;
 }
 
-// Block remote images by replacing src in HTML
+// Block common remote image patterns in email HTML for privacy/security.
+// Limitations: does not cover all CSS background-image variations (e.g. multiple
+// backgrounds or mixed data+http URIs). Email content is displayed in a sandboxed
+// iframe so actual network requests are already blocked; this neutralises the
+// srcDoc value before it reaches the iframe, guarding against future policy changes.
 function blockRemoteImages(html: string): string {
     return html
         .replace(/(src=")https?:\/\//gi, '$1data:blocked,')

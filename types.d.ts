@@ -172,8 +172,8 @@ type EventPayloadMapping = {
     // Updater
     checkForUpdates: UpdateInfo;
     getAppVersion: string;
-    // Multi-account
-    getAccounts: { email: string; password: string; host: string; label?: string }[];
+    // Multi-account (password never returned to renderer)
+    getAccounts: { email: string; host: string; label?: string }[];
     saveAccount: void;
     removeAccount: void;
     switchAccount: void;
@@ -271,7 +271,7 @@ interface Window {
         checkForUpdates: () => Promise<UpdateInfo>;
         getAppVersion: () => Promise<string>;
         // Multi-account
-        getAccounts: () => Promise<{ email: string; password: string; host: string; label?: string }[]>;
+        getAccounts: () => Promise<{ email: string; host: string; label?: string }[]>;
         saveAccount: (account: { email: string; password: string; host: string; label?: string }) => Promise<void>;
         removeAccount: (params: { email: string; host: string }) => Promise<void>;
         switchAccount: (params: { email: string; host: string }) => Promise<void>;

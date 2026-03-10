@@ -344,9 +344,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const t = (key: string): string => {
-        return (translations[language] as Record<string, string>)?.[key]
-            ?? (translations['en'] as Record<string, string>)?.[key]
-            ?? key;
+        const dict = (translations as Record<string, Record<string, string>>)[language];
+        const fallback = (translations as Record<string, Record<string, string>>)['en'];
+        return dict?.[key] ?? fallback?.[key] ?? key;
     };
 
     return (

@@ -70,6 +70,7 @@ type Conversation = {
 };
 
 function normaliseSubject(s: string): string {
+    // Strip common reply/forward prefixes including German (Aw:) and Swedish (Sv:)
     return s.replace(/^(re|fwd?|aw|sv):\s*/gi, '').trim().toLowerCase();
 }
 
@@ -461,7 +462,8 @@ function formatDate(date: string): string {
     if (d.toDateString() === now.toDateString()) {
         return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
     }
-    const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
     if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
     if (d.getFullYear() === now.getFullYear()) return d.toLocaleDateString(undefined, { day:'numeric', month:'short' });
     return d.toLocaleDateString(undefined, { day:'numeric', month:'short', year:'2-digit' });

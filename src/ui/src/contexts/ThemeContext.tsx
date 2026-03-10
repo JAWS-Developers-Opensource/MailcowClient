@@ -14,8 +14,9 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    const stored = (typeof localStorage !== 'undefined' && localStorage.getItem('mc_theme')) as 'light' | 'dark' | null;
-    const [theme, setTheme] = useState<'light' | 'dark'>(stored ?? 'light');
+    const storedRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('mc_theme') : null;
+    const stored: 'light' | 'dark' = storedRaw === 'dark' ? 'dark' : 'light';
+    const [theme, setTheme] = useState<'light' | 'dark'>(stored);
 
     const toggleTheme = () => {
         const next = theme === 'light' ? 'dark' : 'light';

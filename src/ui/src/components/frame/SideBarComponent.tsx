@@ -4,6 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNotification } from '../../contexts/NotificationContext';
+import UILogger from '../../helpers/UILogger';
 import './SideBarComponent.css';
 
 type StoredAccount = { email: string; password: string; host: string; label?: string };
@@ -22,7 +23,9 @@ const Sidebar: React.FC = () => {
     const isActive = (path: string) => location.pathname.startsWith(path);
 
     useEffect(() => {
-        window.electron.getAccounts?.().then(setAccounts).catch(() => {});
+        window.electron.getAccounts?.()
+            .then(setAccounts)
+            .catch((e) => UILogger.error('Sidebar', 'Failed to load accounts', e));
     }, []);
 
     const handleSwitch = async (acc: StoredAccount) => {

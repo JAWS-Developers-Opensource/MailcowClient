@@ -6,6 +6,10 @@
  *   import UILogger from '../helpers/UILogger';
  *   UILogger.info('MailPage', 'Loaded 30 emails');
  *   UILogger.error('ComposeEmail', 'Send failed', err);
+ *
+ * Debug logging:
+ *   Set `window.__MC_DEBUG__ = true` in the DevTools console to enable
+ *   UILogger.debug() output at runtime without restarting the app.
  */
 
 type LogLevel = 'INFO' | 'OK' | 'WARN' | 'ERROR' | 'DEBUG';
