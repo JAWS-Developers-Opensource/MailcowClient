@@ -1,3 +1,11 @@
 .email-list {
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.email-list-empty {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+    font-size: 0.9rem;
 }

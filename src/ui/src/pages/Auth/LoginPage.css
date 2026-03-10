@@ -185,3 +185,146 @@
         font-size: 0.8rem;
     }
 }
+/* ── Tab switcher ──────────────────────────────────────────────────────────── */
+.login-tabs {
+    display: flex;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.login-tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #666;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -2px;
+}
+
+.login-tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    font-weight: 600;
+}
+
+.login-tab-btn:hover:not(.active) {
+    color: #3498db;
+}
+
+/* ── MFA step ──────────────────────────────────────────────────────────────── */
+.mfa-hint {
+    font-size: 0.9rem;
+    color: #555;
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 12px 14px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    text-align: left;
+    line-height: 1.5;
+}
+
+/* ── Secondary login button ────────────────────────────────────────────────── */
+.login-btn-secondary {
+    background-color: #95a5a6;
+    margin-top: 8px;
+}
+
+.login-btn-secondary:hover:not(:disabled) {
+    background-color: #7f8c8d;
+}
+
+/* ── OAuth2 section ────────────────────────────────────────────────────────── */
+.oauth2-section {
+    text-align: left;
+}
+
+.oauth2-description {
+    font-size: 0.88rem;
+    color: #555;
+    background: #e8f4fd;
+    border-left: 4px solid #3498db;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+/* host input + check button side by side */
+.input-with-btn {
+    display: flex;
+    gap: 8px;
+}
+
+.input-with-btn input {
+    flex: 1;
+}
+
+.check-btn {
+    padding: 0 14px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.check-btn:hover:not(:disabled) {
+    background-color: #2980b9;
+}
+
+.check-btn:disabled {
+    background-color: #bdc3c7;
+    cursor: default;
+}
+
+/* availability badges */
+.status-badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-ok {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* optional label badge */
+.optional {
+    font-size: 0.78rem;
+    color: #888;
+    font-weight: normal;
+}
+
+/* OAuth2 setup guide link */
+.oauth2-setup-link {
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: #777;
+    text-align: center;
+}
+
+.oauth2-setup-link a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.oauth2-setup-link a:hover {
+    text-decoration: underline;
+}

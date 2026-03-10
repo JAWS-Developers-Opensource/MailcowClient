@@ -1,0 +1,86 @@
+name: 👥 Contacts / CardDAV Issue
+description: Report a problem with contacts loading, creating, editing, or deleting via CardDAV
+title: "[Contacts]: "
+labels: ["contacts", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for issues related to the Contacts section (CardDAV), including address book management, contact CRUD, and vCard parsing.
+
+  - type: dropdown
+    id: contacts_area
+    attributes:
+      label: Contacts Sub-area
+      options:
+        - CardDAV connection
+        - Address book list
+        - Loading contacts
+        - Contact search
+        - Create contact
+        - Edit contact
+        - Delete contact
+        - vCard parsing (wrong name/email/phone)
+    validations:
+      required: true
+
+  - type: input
+    id: carddav_host
+    attributes:
+      label: CardDAV Server Host
+      description: The hostname of your server (e.g. `mail.example.com`). Do NOT include credentials.
+      placeholder: "mail.example.com"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Issue
+      placeholder: "Contacts load but the phone number field is always empty …"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Navigate to Contacts
+        2. Select address book 'Personal'
+        3. Click a contact
+        4. Phone field is blank
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: vcard_sample
+    attributes:
+      label: Sample vCard (anonymized)
+      description: If the issue is with vCard parsing, paste an anonymized example (replace real names/emails with fake ones).
+      render: text
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Electron / DevTools Errors
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Context

@@ -1,5 +1,28 @@
 .calendar-container {
-    height: 100vh;
-    background-color: #f9f9f9;
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
 }
+
+.event-delete-bar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.event-delete-btn {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    transition: opacity 0.2s;
+}
+
+.event-delete-btn:hover { opacity: 0.85; }

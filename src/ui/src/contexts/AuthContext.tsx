@@ -30,24 +30,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         surname: "",
     });
 
-    const loginF = async () => {
+    /** Attempt automatic login on startup using stored credentials. */
+    const autoLogin = async () => {
         setLoadingStatus(true);
-        window.electron.getUserCredentials().then(async (userCredentials) => {
-            const response = await window.electron.imapCheckCredentials(userCredentials.email, userCredentials.password, userCredentials.host);
-            switch (response.status) {
-                case "success":
-                    addNotification("Welcome back", "success");
+
+        // 1. Try OAuth2 credentials first
+        try {
+            const oauth2 = await window.electron.getOAuth2Credentials();
+            if (oauth2 && oauth2.accessToken) {
+                // Verify the token is still valid by hitting the Mailcow profile endpoint
+                const profileRes = await fetch(`https://${oauth2.host}/oauth/profile`, {
+                    headers: { Authorization: `Bearer ${oauth2.accessToken}` },
+                });
+                if (profileRes.ok) {
+                    addNotification("Auth", "Welcome back", "success");
+                    setUser({ name: "", surname: "", email: oauth2.email, id: 0 });
                     setIsAuthenticated(true);
-                    setLoadingStatus(false)
+                    setLoadingStatus(false);
                     nav("/");
-                    break;
+                    return;
+                }
             }
-        })
+        } catch {
+            // OAuth2 check failed; fall through to IMAP
+        }
+
+        // 2. Fall back to IMAP credentials
+        try {
+            const userCredentials = await window.electron.getUserCredentials();
+            if (userCredentials.email && userCredentials.password && userCredentials.host) {
+                const response = await window.electron.imapCheckCredentials(
+                    userCredentials.email,
+                    userCredentials.password,
+                    userCredentials.host
+                );
+                if (response.status === "success") {
+                    addNotification("Auth", "Welcome back", "success");
+                    setUser({ name: "", surname: "", email: userCredentials.email, id: 0 });
+                    setIsAuthenticated(true);
+                    setLoadingStatus(false);
+                    nav("/");
+                    return;
+                }
+            }
+        } catch {
+            // IMAP check failed
+        }
+
+        setLoadingStatus(false);
     };
 
-
     useEffect(() => {
-        loginF();
+        autoLogin();
     }, []);
 
     const login = (email: string) => {
@@ -62,21 +96,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = () => {
-        setLoadingStatus(true)
+        setLoadingStatus(true);
         setIsAuthenticated(false);
-        setUser({
-            name: "",
-            surname: "",
-            email: "",
-            id: 0,
-        })
+        setUser({ name: "", surname: "", email: "", id: 0 });
         window.electron.removeUserCredentials();
-        setLoadingStatus(false)
+        window.electron.removeOAuth2Credentials();
+        setLoadingStatus(false);
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, loading, user }
-        }>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout, loading, user }}>
             {children}
         </AuthContext.Provider>
     );
@@ -89,7 +118,7 @@ export const RequireAuth = ({ children }: { children: ReactNode }) => {
     const nav = useNavigate();
 
     if (loading) {
-        <LoadingScreen />
+        return <LoadingScreen />;
     }
 
     if (!isAuthenticated) {

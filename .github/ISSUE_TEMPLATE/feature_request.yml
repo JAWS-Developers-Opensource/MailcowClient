@@ -1,0 +1,70 @@
+name: 🚀 Feature Request
+description: Suggest a new feature or improvement for MailcowClient
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make MailcowClient better? We'd love to hear it!
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the app does this feature relate to?
+      options:
+        - Email — reading
+        - Email — sending (SMTP)
+        - Email — folders / labels
+        - Calendar
+        - Contacts
+        - Settings
+        - Authentication
+        - Notifications
+        - Keyboard shortcuts
+        - Theme / Accessibility
+        - New section (not listed above)
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: Describe the problem or limitation that this feature would solve.
+      placeholder: "I'm always frustrated when … because …"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature you'd like to see implemented.
+      placeholder: "It would be great if the app could …"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Importance to You
+      options:
+        - Nice to have
+        - Would use it regularly
+        - Blocking my workflow
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Context
+      description: Add any screenshots, mockups, or links to similar implementations in other apps.
