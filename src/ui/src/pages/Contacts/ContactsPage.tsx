@@ -186,9 +186,24 @@ const ContactsPage: React.FC = () => {
                                 </div>
                                 <div className="contact-info">
                                     <div className="contact-name">{contact.displayName}</div>
+                                    {contact.title && <div className="contact-detail contact-detail--title">💼 {contact.title}</div>}
                                     {contact.email && <div className="contact-detail">✉ {contact.email}</div>}
                                     {contact.phone && <div className="contact-detail">📞 {contact.phone}</div>}
                                     {contact.company && <div className="contact-detail">🏢 {contact.company}</div>}
+                                    {contact.birthday && (
+                                        <div className="contact-detail">🎂 {contact.birthday}</div>
+                                    )}
+                                    {(contact.city || contact.country) && (
+                                        <div className="contact-detail">
+                                            📍 {[contact.address, contact.city, contact.country].filter(Boolean).join(', ')}
+                                        </div>
+                                    )}
+                                    {contact.website && (
+                                        <div className="contact-detail">
+                                            🌐 <a href={contact.website} target="_blank" rel="noreferrer" className="contact-link">{contact.website}</a>
+                                        </div>
+                                    )}
+                                    {contact.notes && <div className="contact-detail contact-detail--notes">📝 {contact.notes}</div>}
                                 </div>
                                 <div className="contact-actions">
                                     <button

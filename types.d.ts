@@ -100,6 +100,12 @@ type ParsedContact = {
     phone: string;
     company: string;
     notes: string;
+    title?: string;
+    birthday?: string;
+    address?: string;
+    city?: string;
+    country?: string;
+    website?: string;
     url?: string;
     etag?: string;
 };
@@ -247,6 +253,12 @@ interface Window {
             phone?: string;
             company?: string;
             notes?: string;
+            title?: string;
+            birthday?: string;
+            address?: string;
+            city?: string;
+            country?: string;
+            website?: string;
         }) => Promise<void>;
         cardUpdateContact: (params: {
             vCard: DAVVCard;
@@ -256,6 +268,12 @@ interface Window {
             phone?: string;
             company?: string;
             notes?: string;
+            title?: string;
+            birthday?: string;
+            address?: string;
+            city?: string;
+            country?: string;
+            website?: string;
         }) => Promise<void>;
         cardDeleteContact: (vCard: DAVVCard) => Promise<void>;
         // Settings

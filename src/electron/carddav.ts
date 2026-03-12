@@ -40,6 +40,12 @@ export const createContact = async (params: {
     phone?: string;
     company?: string;
     notes?: string;
+    title?: string;
+    birthday?: string;
+    address?: string;
+    city?: string;
+    country?: string;
+    website?: string;
 }): Promise<void> => {
     await cardClient.login();
     const uid = generateUUID();
@@ -51,6 +57,12 @@ export const createContact = async (params: {
         phone: params.phone ?? '',
         company: params.company ?? '',
         notes: params.notes ?? '',
+        title: params.title ?? '',
+        birthday: params.birthday ?? '',
+        address: params.address ?? '',
+        city: params.city ?? '',
+        country: params.country ?? '',
+        website: params.website ?? '',
     });
 
     await cardClient.createVCard({
@@ -68,6 +80,12 @@ export const updateContact = async (params: {
     phone?: string;
     company?: string;
     notes?: string;
+    title?: string;
+    birthday?: string;
+    address?: string;
+    city?: string;
+    country?: string;
+    website?: string;
 }): Promise<void> => {
     await cardClient.login();
 
@@ -80,6 +98,12 @@ export const updateContact = async (params: {
         phone: params.phone ?? '',
         company: params.company ?? '',
         notes: params.notes ?? '',
+        title: params.title ?? '',
+        birthday: params.birthday ?? '',
+        address: params.address ?? '',
+        city: params.city ?? '',
+        country: params.country ?? '',
+        website: params.website ?? '',
     });
 
     await cardClient.updateVCard({
@@ -102,6 +126,12 @@ function buildVCard(params: {
     phone: string;
     company: string;
     notes: string;
+    title: string;
+    birthday: string;
+    address: string;
+    city: string;
+    country: string;
+    website: string;
 }): string {
     const lines = [
         'BEGIN:VCARD',
@@ -110,10 +140,20 @@ function buildVCard(params: {
         `FN:${params.firstName} ${params.lastName}`.trim(),
         `N:${params.lastName};${params.firstName};;;`,
     ];
-    if (params.email) lines.push(`EMAIL;TYPE=INTERNET:${params.email}`);
-    if (params.phone) lines.push(`TEL;TYPE=CELL:${params.phone}`);
+    if (params.email)   lines.push(`EMAIL;TYPE=INTERNET:${params.email}`);
+    if (params.phone)   lines.push(`TEL;TYPE=CELL:${params.phone}`);
     if (params.company) lines.push(`ORG:${params.company}`);
-    if (params.notes) lines.push(`NOTE:${params.notes}`);
+    if (params.title)   lines.push(`TITLE:${params.title}`);
+    if (params.notes)   lines.push(`NOTE:${params.notes}`);
+    if (params.birthday) {
+        // Store as YYYY-MM-DD
+        lines.push(`BDAY:${params.birthday}`);
+    }
+    if (params.address || params.city || params.country) {
+        // ADR format: ;;street;city;state;zip;country
+        lines.push(`ADR;TYPE=HOME:;;${params.address};${params.city};;;${params.country}`);
+    }
+    if (params.website) lines.push(`URL:${params.website}`);
     lines.push('END:VCARD');
     return lines.join('\r\n');
 }

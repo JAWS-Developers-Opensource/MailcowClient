@@ -7,7 +7,7 @@ import { useNotification } from '../../contexts/NotificationContext';
 import UILogger from '../../helpers/UILogger';
 import './SideBarComponent.css';
 
-type StoredAccount = { email: string; password: string; host: string; label?: string };
+type PublicAccount = { email: string; host: string; label?: string };
 
 const Sidebar: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
@@ -18,7 +18,7 @@ const Sidebar: React.FC = () => {
     const location = useLocation();
 
     const [showAccountMenu, setShowAccountMenu] = useState(false);
-    const [accounts, setAccounts] = useState<StoredAccount[]>([]);
+    const [accounts, setAccounts] = useState<PublicAccount[]>([]);
 
     const isActive = (path: string) => location.pathname.startsWith(path);
 
@@ -28,7 +28,7 @@ const Sidebar: React.FC = () => {
             .catch((e) => UILogger.error('Sidebar', 'Failed to load accounts', e));
     }, []);
 
-    const handleSwitch = async (acc: StoredAccount) => {
+    const handleSwitch = async (acc: PublicAccount) => {
         await window.electron.switchAccount?.(acc);
         window.location.reload();
     };

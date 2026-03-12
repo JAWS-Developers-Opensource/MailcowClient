@@ -191,6 +191,27 @@
     text-overflow: ellipsis;
 }
 
+.contact-detail--title {
+    color: var(--primary-color, #3498db);
+    font-weight: 600;
+}
+
+.contact-detail--notes {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    color: #aaa;
+    font-style: italic;
+    font-size: 0.75rem;
+}
+
+.contact-link {
+    color: var(--primary-color, #3498db);
+    text-decoration: none;
+}
+
+.contact-link:hover { text-decoration: underline; }
+
 .contact-actions {
     display: flex;
     flex-direction: column;

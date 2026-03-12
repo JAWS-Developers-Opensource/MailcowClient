@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './SettingsPage.css';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+
+type PublicAccount = { email: string; host: string; label?: string };
 
 type MailboxInfo = Record<string, any>;
 type AliasEntry = Record<string, any>;
@@ -34,6 +37,7 @@ const SettingsPage: React.FC = () => {
     const { addNotification } = useNotification();
     const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
+    const nav = useNavigate();
 
     const [apiKey, setApiKey] = useState('');
     const [apiKeyInput, setApiKeyInput] = useState('');
@@ -56,6 +60,10 @@ const SettingsPage: React.FC = () => {
 
     const [aclJson, setAclJson] = useState('{\n  "active": "1"\n}');
 
+    // Multi-account state
+    const [accounts, setAccounts] = useState<PublicAccount[]>([]);
+    const [removingAccount, setRemovingAccount] = useState<string | null>(null);
+
     useEffect(() => {
         window.electron.settingsGetApiKey().then((key) => {
             if (key) {
@@ -65,6 +73,9 @@ const SettingsPage: React.FC = () => {
         });
         window.electron.getUserCredentials().then((creds) => {
             setHost(creds.host);
+        });
+        window.electron.getAccounts().then(setAccounts).catch((e: Error) => {
+            addNotification('Settings', `Failed to load accounts: ${e.message}`, 'error');
         });
     }, []);
 
@@ -178,6 +189,30 @@ const SettingsPage: React.FC = () => {
         }
     };
 
+    const handleSwitchAccount = async (acc: PublicAccount) => {
+        try {
+            await window.electron.switchAccount(acc);
+            addNotification('Settings', `Switched to ${acc.email}`, 'success');
+            window.location.reload();
+        } catch (e: any) {
+            addNotification('Settings', `Switch failed: ${e.message}`, 'error');
+        }
+    };
+
+    const handleRemoveAccount = async (acc: PublicAccount) => {
+        const key = acc.email + acc.host;
+        setRemovingAccount(key);
+        try {
+            await window.electron.removeAccount(acc);
+            setAccounts((prev) => prev.filter((a) => !(a.email === acc.email && a.host === acc.host)));
+            addNotification('Settings', `Account ${acc.email} removed.`, 'success');
+        } catch (e: any) {
+            addNotification('Settings', `Remove failed: ${e.message}`, 'error');
+        } finally {
+            setRemovingAccount(null);
+        }
+    };
+
     const usedMB = mailboxInfo?.quota_used ? Math.round(mailboxInfo.quota_used / 1024 / 1024) : 0;
     const totalMB = mailboxInfo?.quota ? Math.round(mailboxInfo.quota / 1024 / 1024) : 0;
     const quotaPct = totalMB > 0 ? Math.round((usedMB / totalMB) * 100) : 0;
@@ -202,6 +237,60 @@ const SettingsPage: React.FC = () => {
                     <div className="settings-row">
                         <button className="settings-logout-btn" onClick={logout}>
                             🚪 Sign Out
+                        </button>
+                    </div>
+                </section>
+
+                {/* ── Multi-account ─────────────────────────────────────────── */}
+                <section className="settings-section">
+                    <h2 className="settings-section-title">Accounts</h2>
+                    <p className="settings-hint">
+                        Manage all saved accounts. Switch between them or remove ones you no longer need.
+                        To add a new account, sign out and log in with different credentials.
+                    </p>
+                    <ul className="aliases-list">
+                        {accounts.length === 0 && (
+                            <li className="alias-item">No additional accounts saved.</li>
+                        )}
+                        {accounts.map((acc) => {
+                            const key = acc.email + acc.host;
+                            const isCurrent = acc.email === user.email;
+                            return (
+                                <li key={key} className="alias-item alias-item--action">
+                                    <span>
+                                        <strong>{acc.email}</strong>
+                                        {acc.label && <em> ({acc.label})</em>}
+                                        <span style={{ color: '#94a3b8', marginLeft: 8, fontSize: '0.8em' }}>{acc.host}</span>
+                                        {isCurrent && (
+                                            <span className="settings-badge badge-active" style={{ marginLeft: 8 }}>
+                                                active
+                                            </span>
+                                        )}
+                                    </span>
+                                    <span style={{ display: 'flex', gap: 6 }}>
+                                        {!isCurrent && (
+                                            <button
+                                                className="settings-save-btn"
+                                                onClick={() => handleSwitchAccount(acc)}
+                                            >
+                                                Switch
+                                            </button>
+                                        )}
+                                        <button
+                                            className="settings-inline-danger"
+                                            disabled={removingAccount === key}
+                                            onClick={() => handleRemoveAccount(acc)}
+                                        >
+                                            {removingAccount === key ? '…' : 'Remove'}
+                                        </button>
+                                    </span>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                    <div className="settings-row" style={{ marginTop: 12 }}>
+                        <button className="settings-fetch-btn" onClick={() => nav('/auth')}>
+                            + Add Account
                         </button>
                     </div>
                 </section>
