@@ -5,7 +5,71 @@
     background: var(--background-color, #f0f2f5);
 }
 
-/* ── Folder sidebar ──────────────────────────────────────────────────────── */
+/* ── Account switcher ────────────────────────────────────────────────────── */
+.mail-account-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 8px 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    flex-shrink: 0;
+}
+
+.mail-account-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: var(--text-color, #4a5568);
+    transition: background 0.12s;
+    text-align: left;
+}
+
+.mail-account-tab:hover { background: var(--hover-background-color, #f1f5f9); }
+
+.mail-account-tab--active {
+    background: var(--primary-color, #007bff);
+    color: #fff;
+}
+
+.mail-account-tab--active:hover { opacity: 0.9; }
+
+.mail-account-tab:disabled { opacity: 0.5; cursor: wait; }
+
+.mail-account-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    color: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.mail-account-tab:not(.mail-account-tab--active) .mail-account-avatar {
+    background: var(--primary-color, #007bff);
+    color: #fff;
+    border-color: transparent;
+}
+
+.mail-account-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+
 .mail-folders {
     width: 210px;
     flex-shrink: 0;

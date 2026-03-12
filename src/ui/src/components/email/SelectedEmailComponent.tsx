@@ -60,9 +60,28 @@ const SelectedEmailComponent: React.FC<Props> = ({
         [email.bodyHtml],
     );
 
+    // Wrap bare HTML fragments in a full document so that fonts, layout and
+    // viewport styles are applied correctly inside the sandboxed iframe.
+    const wrapHtml = (html: string): string => {
+        const isFullDoc = /^\s*<!DOCTYPE|^\s*<html/i.test(html);
+        if (isFullDoc) return html;
+        return `<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#222;margin:0;padding:20px;word-wrap:break-word;overflow-x:auto}
+  a{color:#2563eb}img{max-width:100%;height:auto}
+  table{border-collapse:collapse;max-width:100%}
+  pre,code{white-space:pre-wrap;word-break:break-all;font-size:0.88em}
+  blockquote{border-left:3px solid #cbd5e1;margin:8px 0;padding:4px 12px;color:#64748b}
+</style>
+</head><body>${html}</body></html>`;
+    };
+
     const processedHtml = useMemo(() => {
         if (!email.bodyHtml) return '';
-        return imagesAllowed ? email.bodyHtml : blockRemoteImages(email.bodyHtml);
+        const raw = imagesAllowed ? email.bodyHtml : blockRemoteImages(email.bodyHtml);
+        return wrapHtml(raw);
     }, [email.bodyHtml, imagesAllowed]);
 
     const handleMove = (toFolder: string) => {
@@ -169,6 +188,11 @@ const SelectedEmailComponent: React.FC<Props> = ({
             {/* ── Header ─────────────────────────────────────────── */}
             <div className="selected-email-header">
                 <h2 className="selected-email-subject">{email.subject}</h2>
+                <div className="selected-email-meta">
+                    <div className="meta-row"><span className="meta-key">From</span><span>{email.from}</span></div>
+                    {email.to && <div className="meta-row"><span className="meta-key">To</span><span>{email.to}</span></div>}
+                    {email.date && <div className="meta-row"><span className="meta-key">Date</span><span>{new Date(email.date).toLocaleString()}</span></div>}
+                </div>
             </div>
 
             {/* ── Body ───────────────────────────────────────────── */}
