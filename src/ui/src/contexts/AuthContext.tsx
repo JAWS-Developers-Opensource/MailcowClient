@@ -30,53 +30,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         surname: "",
     });
 
-    /** Attempt automatic login on startup using stored credentials. */
+    /** Attempt automatic login on startup — credential check happens entirely in the
+     *  main process; the renderer never receives any stored password. */
     const autoLogin = async () => {
         setLoadingStatus(true);
-
-        // 1. Try OAuth2 credentials first
         try {
-            const oauth2 = await window.electron.getOAuth2Credentials();
-            if (oauth2 && oauth2.accessToken) {
-                // Verify the token is still valid by hitting the Mailcow profile endpoint
-                const profileRes = await fetch(`https://${oauth2.host}/oauth/profile`, {
-                    headers: { Authorization: `Bearer ${oauth2.accessToken}` },
-                });
-                if (profileRes.ok) {
-                    addNotification("Auth", "Welcome back", "success");
-                    setUser({ name: "", surname: "", email: oauth2.email, id: 0 });
-                    setIsAuthenticated(true);
-                    setLoadingStatus(false);
-                    nav("/");
-                    return;
-                }
+            const result = await window.electron.autoLogin();
+            if (result.success) {
+                addNotification("Auth", "Welcome back", "success");
+                setUser({ name: "", surname: "", email: result.email, id: 0 });
+                setIsAuthenticated(true);
+                nav("/");
             }
         } catch {
-            // OAuth2 check failed; fall through to IMAP
+            // Auto-login failed — user will be directed to the login page
         }
-
-        // 2. Fall back to IMAP credentials
-        try {
-            const userCredentials = await window.electron.getUserCredentials();
-            if (userCredentials.email && userCredentials.password && userCredentials.host) {
-                const response = await window.electron.imapCheckCredentials(
-                    userCredentials.email,
-                    userCredentials.password,
-                    userCredentials.host
-                );
-                if (response.status === "success") {
-                    addNotification("Auth", "Welcome back", "success");
-                    setUser({ name: "", surname: "", email: userCredentials.email, id: 0 });
-                    setIsAuthenticated(true);
-                    setLoadingStatus(false);
-                    nav("/");
-                    return;
-                }
-            }
-        } catch {
-            // IMAP check failed
-        }
-
         setLoadingStatus(false);
     };
 

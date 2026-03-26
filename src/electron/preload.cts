@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electron', {
   saveUserCredentials: (userCredentials) => ipcSend('saveUserCredentials', userCredentials),
   getUserCredentials: () => ipcInvoke('getUserCredentials'),
   removeUserCredentials: () => ipcInvoke('removeUserCredentials'),
+  autoLogin: () => ipcInvoke('autoLogin'),
   // OAuth2
   checkOAuth2Available: (host) => ipcInvoke('checkOAuth2Available', { host }),
   startOAuth2Login: (host, clientId, clientSecret) => ipcInvoke('startOAuth2Login', { host, clientId, clientSecret }),

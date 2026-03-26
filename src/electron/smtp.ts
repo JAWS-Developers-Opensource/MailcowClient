@@ -21,10 +21,10 @@ export async function sendEmail(params: {
                 user: params.fromEmail,
                 pass: params.password,
             },
-            // NOTE: self-hosted Mailcow instances often use self-signed certificates.
-            // Set MAILCOW_TLS_STRICT=1 in the environment to enforce full validation.
+            // TLS certificate validation is ENABLED by default.
+            // Set MAILCOW_TLS_SKIP_VERIFY=1 only for self-signed-cert dev servers.
             tls: {
-                rejectUnauthorized: process.env.MAILCOW_TLS_STRICT === "1",
+                rejectUnauthorized: process.env.MAILCOW_TLS_SKIP_VERIFY !== '1',
             },
         });
 

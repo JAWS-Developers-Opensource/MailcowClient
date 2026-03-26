@@ -23,9 +23,9 @@ async function getConnection(credentials: { email: string; password: string; hos
                 host: credentials.host,
                 port: 993,
                 tls: true,
-                // NOTE: self-hosted Mailcow instances often use self-signed certificates.
-                // Set MAILCOW_TLS_STRICT=1 in the environment to enforce full validation.
-                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_STRICT === "1" },
+                // TLS certificate validation is ENABLED by default.
+                // Set MAILCOW_TLS_SKIP_VERIFY=1 only for self-signed-cert dev servers.
+                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_SKIP_VERIFY !== '1' },
             },
             connectTimeout: 20000,
         };
@@ -60,8 +60,9 @@ export class ImapManager {
                 host: params.host,
                 port: 993,
                 tls: true,
-                // NOTE: self-hosted Mailcow instances often use self-signed certificates.
-                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_STRICT === "1" },
+                // TLS certificate validation is ENABLED by default.
+                // Set MAILCOW_TLS_SKIP_VERIFY=1 only for self-signed-cert dev servers.
+                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_SKIP_VERIFY !== '1' },
             },
             connectTimeout: 20000,
         };
