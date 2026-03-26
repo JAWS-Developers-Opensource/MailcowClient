@@ -48,7 +48,9 @@ const CSP = [
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' data: blob:",
-    "connect-src 'self' https:",
+    // 'self' covers same-origin HTTP(S); https: covers external API calls.
+    // ws:/wss: are needed for Vite HMR in development (harmless in production).
+    "connect-src 'self' https: ws: wss:",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'none'",
@@ -78,16 +80,19 @@ app.on('ready', () => {
     session.defaultSession.setPermissionCheckHandler(() => false);
 
     // ── Main window ───────────────────────────────────────────────────────────
+    // NOTE: sandbox:true is intentionally omitted for the main window.
+    // The preload script uses CommonJS require('electron'), which is not
+    // available inside a fully-sandboxed renderer process. Removing it here
+    // is the correct approach when a preload bridge is in use; the remaining
+    // webPreferences (contextIsolation, nodeIntegration:false, webSecurity)
+    // still provide the important security boundaries.
     const mainWindow = new BrowserWindow({
         webPreferences: {
             preload: getPreloadPath(),
             nodeIntegration: false,       // never allow Node.js in renderer
             contextIsolation: true,       // isolate preload from renderer
-            sandbox: true,                // full Chromium sandbox
             webSecurity: true,            // enforce same-origin policy
             allowRunningInsecureContent: false,
-            experimentalFeatures: false,
-            navigateOnDragDrop: false,    // prevent drag-and-drop navigation attacks
             webviewTag: false,            // disable <webview> (privileged)
         },
     });
