@@ -2,6 +2,13 @@ import React from 'react';
 import './NewEventComponent.css';
 import { DAVCalendar } from 'tsdav';
 
+type FlatCalendarEntry = {
+    calendar: DAVCalendar;
+    accountEmail: string;
+    accountHost: string;
+    accountLabel?: string;
+};
+
 interface NewEventProps {
     newEvent: {
         title: string;
@@ -17,7 +24,7 @@ interface NewEventProps {
     setNewEvent: (event: any) => void;
     handleSaveEvent: () => void;
     closePopup: () => void;
-    calendars: DAVCalendar[];
+    flatCalendars: FlatCalendarEntry[];
     isEdit?: boolean;
     onDelete?: () => void;
 }
@@ -27,7 +34,7 @@ const NewEventComponent: React.FC<NewEventProps> = ({
     setNewEvent,
     handleSaveEvent,
     closePopup,
-    calendars,
+    flatCalendars,
     isEdit = false,
     onDelete,
 }) => {
@@ -75,9 +82,10 @@ const NewEventComponent: React.FC<NewEventProps> = ({
                             value={newEvent.calendarIndex}
                             onChange={(e) => setNewEvent({ ...newEvent, calendarIndex: Number(e.target.value) })}
                         >
-                            {calendars.map((cal, idx) => (
-                                <option key={cal.url} value={idx}>
-                                    {String(cal.displayName ?? cal.url)}
+                            {flatCalendars.map((entry, idx) => (
+                                <option key={`${entry.accountEmail}|${entry.calendar.url}`} value={idx}>
+                                    {String(entry.calendar.displayName ?? entry.calendar.url)}
+                                    {entry.accountEmail ? ` — ${entry.accountEmail}` : ''}
                                 </option>
                             ))}
                         </select>
@@ -151,3 +159,4 @@ const NewEventComponent: React.FC<NewEventProps> = ({
 };
 
 export default NewEventComponent;
+

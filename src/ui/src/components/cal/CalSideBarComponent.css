@@ -1,81 +1,131 @@
 .cal-sidebar-container {
-    padding: 16px;
+    padding: 16px 12px;
     min-width: 200px;
     max-width: 220px;
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid var(--border-color, #e0e7ff);
     height: 100%;
     overflow-y: auto;
+    background: var(--card-bg, #fff);
 }
 
 .sidebar-title {
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #777;
-    margin: 0 0 10px 0;
+    letter-spacing: 0.08em;
+    color: var(--text-muted, #6b7280);
+    margin: 0 0 12px 0;
+    padding: 0 4px;
 }
 
 .add-event-button {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
+    gap: 7px;
+    padding: 9px 14px;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     border: 0;
-    background-color: var(--primary-color, rgb(0, 187, 0));
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
     color: #fff;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     font-weight: 600;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.3);
 }
 
-.add-event-button:hover { opacity: 0.85; }
+.add-event-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(124,58,237,0.4);
+}
+
+/* ── Account sections ───────────────────────────────────────────────────── */
+.cal-account-section {
+    margin-bottom: 6px;
+}
+
+.cal-account-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 7px 6px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: left;
+    transition: background 0.15s;
+    color: var(--text-muted, #6b7280);
+}
+
+.cal-account-header:hover {
+    background: var(--hover-background-color, #ede9fe);
+}
+
+.cal-account-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-color, #1e1b4b);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
 
 /* ── New calendar form ─────────────────────────────────────────────────────── */
 .new-cal-form {
-    background: var(--hover-background-color, #f0f4f8);
-    border-radius: 8px;
+    background: var(--background-color, #f0f4ff);
+    border-radius: 10px;
     padding: 12px;
     margin-bottom: 12px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    border: 1px solid var(--border-color, #e0e7ff);
 }
 
 .new-cal-input {
-    padding: 7px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.88rem;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color, #e0e7ff);
+    border-radius: 8px;
+    font-size: 0.86rem;
     outline: none;
-    background: #fff;
+    background: var(--card-bg, #fff);
+    color: var(--text-color, #1e1b4b);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.new-cal-input:focus { border-color: var(--primary-color, #3498db); }
+.new-cal-input:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
 
 .color-picker-row {
     display: flex;
-    gap: 6px;
+    gap: 7px;
     flex-wrap: wrap;
 }
 
 .color-dot {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
     padding: 0;
-    transition: transform 0.15s;
+    transition: transform 0.15s, box-shadow 0.15s;
 }
 
+.color-dot:hover { transform: scale(1.15); }
+
 .color-dot--selected {
-    border-color: #333;
+    border-color: #1e1b4b;
     transform: scale(1.2);
+    box-shadow: 0 0 0 2px rgba(124,58,237,0.3);
 }
 
 .new-cal-actions {
@@ -85,65 +135,74 @@
 
 .new-cal-save-btn {
     flex: 1;
-    padding: 6px;
-    background: var(--primary-color, #3498db);
+    padding: 7px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.82rem;
     font-weight: 600;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 8px rgba(124,58,237,0.25);
 }
 
 .new-cal-save-btn:disabled { opacity: 0.6; cursor: default; }
 
 .new-cal-cancel-btn {
     flex: 1;
-    padding: 6px;
+    padding: 7px;
     background: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid var(--border-color, #e0e7ff);
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.82rem;
-    color: #666;
+    color: var(--text-muted, #6b7280);
+    transition: background 0.15s;
 }
+
+.new-cal-cancel-btn:hover { background: var(--hover-background-color, #ede9fe); }
 
 /* ── Calendar list ──────────────────────────────────────────────────────────── */
 .calendar-list {
     list-style: none;
-    padding: 0;
+    padding: 0 0 0 4px;
     margin: 0;
 }
 
 .calendar-item {
     display: flex;
     align-items: center;
-    padding: 7px 4px;
-    gap: 8px;
-    border-radius: 4px;
+    padding: 7px 6px;
+    gap: 9px;
+    border-radius: 8px;
     transition: background 0.15s;
+    cursor: pointer;
 }
 
-.calendar-item:hover { background: var(--hover-background-color, #f0f0f0); }
+.calendar-item:hover { background: var(--hover-background-color, #ede9fe); }
 
 .calendar-color-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
 }
 
 .calendar-label {
     flex: 1;
-    font-size: 0.88rem;
-    color: var(--text-color, #333);
+    font-size: 0.84rem;
+    color: var(--text-color, #1e1b4b);
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    user-select: none;
 }
 
 .calendar-checkbox {
     cursor: pointer;
     flex-shrink: 0;
+    accent-color: #7c3aed;
 }

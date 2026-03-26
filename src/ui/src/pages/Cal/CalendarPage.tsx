@@ -9,13 +9,19 @@ import { useLoading } from '../../contexts/LoadingContext';
 import { ReactEventType } from '../../types/calendar.types';
 import { useCalContext } from '../../contexts/cal/CalContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import UILogger from '../../helpers/UILogger';
-import NewEventComponent from '../../components/cal/NewEventComponent';
 import { useNotification } from '../../contexts/NotificationContext';
 import { FiRefreshCw, FiPlus } from 'react-icons/fi';
+import NewEventComponent from '../../components/cal/NewEventComponent';
 
 const localizer = momentLocalizer(moment);
 moment.locale('it-it', { week: { dow: 1 } });
+
+type FlatCalendarEntry = {
+    calendar: DAVCalendar;
+    accountEmail: string;
+    accountHost: string;
+    accountLabel?: string;
+};
 
 const EMPTY_EVENT = {
     title: '',
@@ -32,6 +38,8 @@ const EMPTY_EVENT = {
 type RichEvent = ReactEventType & {
     calendarObject?: DAVCalendarObject;
     calendarIndex?: number;
+    accountEmail?: string;
+    accountHost?: string;
     description?: string;
     location?: string;
 };
@@ -44,7 +52,7 @@ const CalendarPage: React.FC = () => {
 
     const [events, setEvents] = useState<RichEvent[]>([]);
     const [calEvents, setCalEvents] = useState<{ calendar: DAVCalendar; events: RichEvent[] }[]>([]);
-    const [allCalendars, setAllCalendars] = useState<DAVCalendar[]>([]);
+    const [flatCalendars, setFlatCalendars] = useState<FlatCalendarEntry[]>([]);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [currentView, setCurrentView] = useState<string>(Views.MONTH);
 
@@ -65,19 +73,27 @@ const CalendarPage: React.FC = () => {
         setCalEvents([]);
 
         try {
-            const cals = await window.electron.calGetCalendars();
-            setAllCalendars(cals);
-            calendars.setCalendars(cals);
+            const accountResults = await window.electron.calGetAllAccountCalendars();
+            const flat: FlatCalendarEntry[] = [];
+            for (const r of accountResults) {
+                for (const cal of r.calendars) {
+                    flat.push({ calendar: cal, accountEmail: r.accountEmail, accountHost: r.accountHost, accountLabel: r.accountLabel });
+                }
+            }
+            setFlatCalendars(flat);
+            calendars.setAllAccountCalendars(accountResults);
 
             const calendarColors: Record<string, string> = {};
-            cals.forEach((cal) => { calendarColors[String(cal.displayName)] = String(cal.calendarColor); });
+            flat.forEach(({ calendar: cal }) => {
+                calendarColors[String(cal.displayName)] = String(cal.calendarColor);
+            });
 
             const all: { calendar: DAVCalendar; events: RichEvent[] }[] = [];
 
-            for (const cal of cals) {
+            for (const { calendar: cal, accountEmail, accountHost } of flat) {
                 const callEvents: RichEvent[] = [];
                 try {
-                    const icsEvents = await window.electron.calQueryCalendar(cal, d.getMonth(), d.getFullYear());
+                    const icsEvents = await window.electron.calQueryCalendarForAccount(accountEmail, accountHost, cal, d.getMonth(), d.getFullYear());
                     icsEvents.forEach((entry: any) => {
                         try {
                             const parsedData = ICAL.parse(entry.data);
@@ -94,7 +110,9 @@ const CalendarPage: React.FC = () => {
                                     location: event.location || '',
                                     color: calendarColors[String(cal.displayName)] || '#808080',
                                     calendarObject: entry,
-                                    calendarIndex: cals.indexOf(cal),
+                                    calendarIndex: flat.findIndex(f => f.calendar.url === cal.url && f.accountEmail === accountEmail),
+                                    accountEmail,
+                                    accountHost,
                                 });
                             });
                         } catch { /* skip malformed events */ }
@@ -204,10 +222,12 @@ const CalendarPage: React.FC = () => {
                 });
                 addNotification('Calendar', 'Event updated!', 'success');
             } else {
-                const calendar = allCalendars[newEvent.calendarIndex];
-                if (!calendar) { addNotification('Calendar', 'No calendar selected.', 'error'); return; }
-                await window.electron.calCreateEvent({
-                    calendar,
+                const entry = flatCalendars[newEvent.calendarIndex];
+                if (!entry) { addNotification('Calendar', 'No calendar selected.', 'error'); return; }
+                await window.electron.calCreateEventForAccount({
+                    accountEmail: entry.accountEmail,
+                    accountHost: entry.accountHost,
+                    calendar: entry.calendar,
                     title: newEvent.title,
                     description: newEvent.description,
                     location: newEvent.location,
@@ -366,7 +386,7 @@ const CalendarPage: React.FC = () => {
                     setNewEvent={setNewEvent}
                     handleSaveEvent={handleSaveEvent}
                     closePopup={() => setShowForm(false)}
-                    calendars={allCalendars}
+                    flatCalendars={flatCalendars}
                     isEdit={isEditMode}
                     onDelete={isEditMode && editingObject ? () => handleDeleteEvent(editingObject) : undefined}
                 />
@@ -374,5 +394,6 @@ const CalendarPage: React.FC = () => {
         </div>
     );
 };
+
 
 export default CalendarPage;

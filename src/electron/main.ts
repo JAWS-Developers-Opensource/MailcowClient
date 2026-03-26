@@ -10,7 +10,7 @@ import {
     saveApiKey, getApiKey,
     getAccounts, saveAccount, removeAccount, switchAccount,
 } from './storage.js';
-import { createConn, getCalendars, queryCalendar, createEvent, updateEvent, deleteEvent, createCalendar } from './caldav.js';
+import { createConn, getCalendars, queryCalendar, createEvent, updateEvent, deleteEvent, createCalendar, getCalendarsAllAccounts, queryCalendarForAccount, createEventForAccount, createCalendarForAccount } from './caldav.js';
 import { createCardDavConn, fetchAddressBooks, fetchContacts, createContact, updateContact, deleteContact } from './carddav.js';
 import { checkOAuth2Available, startOAuth2Login } from './oauth.js';
 import { checkForUpdates, getAppVersion } from './updater.js';
@@ -276,6 +276,10 @@ app.on('ready', () => {
     ipcHandle('calUpdateEvent', updateEvent);
     ipcHandle('calDeleteEvent', (params) => deleteEvent(params));
     ipcHandle('calCreateCalendar', createCalendar);
+    ipcHandle('calGetAllAccountCalendars', getCalendarsAllAccounts);
+    ipcHandle('calQueryCalendarForAccount', queryCalendarForAccount);
+    ipcHandle('calCreateEventForAccount', createEventForAccount);
+    ipcHandle('calCreateCalendarForAccount', createCalendarForAccount);
 
     // CardDAV
     ipcHandle('cardCreateConn', createCardDavConn);

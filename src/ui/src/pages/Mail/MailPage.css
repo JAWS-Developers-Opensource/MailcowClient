@@ -33,7 +33,7 @@
 .mail-account-tab:hover { background: var(--hover-background-color, #f1f5f9); }
 
 .mail-account-tab--active {
-    background: var(--primary-color, #007bff);
+    background: var(--primary-color, #7c3aed);
     color: #fff;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .mail-account-tab:not(.mail-account-tab--active) .mail-account-avatar {
-    background: var(--primary-color, #007bff);
+    background: var(--primary-color, #7c3aed);
     color: #fff;
     border-color: transparent;
 }
@@ -92,7 +92,7 @@
     gap: 7px;
     width: 100%;
     padding: 9px 14px;
-    background: var(--primary-color, #007bff);
+    background: var(--primary-color, #7c3aed);
     color: #fff;
     border: none;
     border-radius: 24px;
@@ -101,7 +101,7 @@
     font-weight: 600;
     letter-spacing: 0.02em;
     transition: opacity 0.2s, transform 0.1s;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+    box-shadow: 0 2px 8px rgba(124,58,237,0.3);
 }
 
 .compose-btn:hover { opacity: 0.88; transform: translateY(-1px); }
@@ -151,7 +151,7 @@
 }
 
 .folder-item--active {
-    background: var(--primary-color, #007bff) !important;
+    background: var(--primary-color, #7c3aed) !important;
     color: #fff !important;
 }
 
@@ -307,7 +307,7 @@
     justify-content: center;
     width: 18px;
     height: 18px;
-    background: var(--primary-color, #6366f1);
+    background: var(--primary-color, #7c3aed);
     color: #fff;
     border-radius: 50%;
     font-size: 0.68rem;

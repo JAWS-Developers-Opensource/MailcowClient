@@ -27,39 +27,39 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const root = document.documentElement;
         if (theme === 'light') {
-            root.style.setProperty('--background-color',      '#f0f2f5');
+            root.style.setProperty('--background-color',      '#f0f4ff');
             root.style.setProperty('--sidebar-background-color', '#ffffff');
-            root.style.setProperty('--text-color',            '#1a202c');
-            root.style.setProperty('--text-muted',            '#718096');
-            root.style.setProperty('--hover-background-color','#eef2ff');
-            root.style.setProperty('--primary-color',         '#6366f1');
-            root.style.setProperty('--primary-hover',         '#4f46e5');
-            root.style.setProperty('--border-color',          '#e2e8f0');
+            root.style.setProperty('--text-color',            '#1e1b4b');
+            root.style.setProperty('--text-muted',            '#6b7280');
+            root.style.setProperty('--hover-background-color','#ede9fe');
+            root.style.setProperty('--primary-color',         '#7c3aed');
+            root.style.setProperty('--primary-hover',         '#6d28d9');
+            root.style.setProperty('--border-color',          '#e0e7ff');
             root.style.setProperty('--card-bg',               '#ffffff');
-            root.style.setProperty('--input-bg',              '#f7fafc');
-            root.style.setProperty('--box-shadow',            '0 1px 6px rgba(0,0,0,0.08)');
+            root.style.setProperty('--input-bg',              '#f5f3ff');
+            root.style.setProperty('--box-shadow',            '0 2px 12px rgba(124,58,237,0.08)');
             // Sidebar specific
             root.style.setProperty('--sidebar-bg',            '#1e1b4b');
             root.style.setProperty('--sidebar-text',          'rgba(255,255,255,0.5)');
             root.style.setProperty('--sidebar-text-active',   'rgba(255,255,255,0.95)');
-            root.style.setProperty('--hover-bg',              '#f1f5f9');
+            root.style.setProperty('--hover-bg',              '#ede9fe');
         } else {
-            root.style.setProperty('--background-color',      '#0f0f1a');
-            root.style.setProperty('--sidebar-background-color', '#1a1a2e');
+            root.style.setProperty('--background-color',      '#0a0a1a');
+            root.style.setProperty('--sidebar-background-color', '#12122a');
             root.style.setProperty('--text-color',            '#e2e8f0');
             root.style.setProperty('--text-muted',            '#94a3b8');
-            root.style.setProperty('--hover-background-color','#1e293b');
-            root.style.setProperty('--primary-color',         '#818cf8');
-            root.style.setProperty('--primary-hover',         '#6366f1');
-            root.style.setProperty('--border-color',          '#2d3748');
-            root.style.setProperty('--card-bg',               '#1a1a2e');
-            root.style.setProperty('--input-bg',              '#16213e');
-            root.style.setProperty('--box-shadow',            '0 1px 6px rgba(0,0,0,0.4)');
+            root.style.setProperty('--hover-background-color','#1e1b4b');
+            root.style.setProperty('--primary-color',         '#7c3aed');
+            root.style.setProperty('--primary-hover',         '#6d28d9');
+            root.style.setProperty('--border-color',          '#1e1b4b');
+            root.style.setProperty('--card-bg',               '#12122a');
+            root.style.setProperty('--input-bg',              '#0f0c29');
+            root.style.setProperty('--box-shadow',            '0 2px 12px rgba(0,0,0,0.5)');
             // Sidebar specific
-            root.style.setProperty('--sidebar-bg',            '#0d0d1a');
+            root.style.setProperty('--sidebar-bg',            '#0d0b20');
             root.style.setProperty('--sidebar-text',          'rgba(255,255,255,0.45)');
             root.style.setProperty('--sidebar-text-active',   'rgba(255,255,255,0.95)');
-            root.style.setProperty('--hover-bg',              '#1e293b');
+            root.style.setProperty('--hover-bg',              '#1e1b4b');
         }
     }, [theme]);
 

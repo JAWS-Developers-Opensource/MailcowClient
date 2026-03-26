@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './CalSideBarComponent.css';
 import { useLoading } from '../../contexts/LoadingContext';
 import { DAVCalendar } from 'tsdav';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { useCalContext } from '../../contexts/cal/CalContext';
 import { useNotification } from '../../contexts/NotificationContext';
 
@@ -17,25 +17,53 @@ export const CalSideBarComponent = () => {
     const [newCalName, setNewCalName] = useState('');
     const [newCalColor, setNewCalColor] = useState('#3498db');
     const [saving, setSaving] = useState(false);
+    const [collapsedAccounts, setCollapsedAccounts] = useState<Set<string>>(new Set());
+    const [selectedAccountKey, setSelectedAccountKey] = useState<string>('');
 
     const loadCal = async () => {
         setLoadingStatus(true);
-        window.electron.calGetCalendars().then((data: DAVCalendar[]) => {
-            calendars.setCalendars(data);
+        try {
+            const results = await window.electron.calGetAllAccountCalendars();
+            calendars.setAllAccountCalendars(results);
+            if (results.length > 0 && !selectedAccountKey) {
+                setSelectedAccountKey(`${results[0].accountEmail}|${results[0].accountHost}`);
+            }
+        } catch {
+            // ignore
+        } finally {
             setLoadingStatus(false);
-        }).catch(() => setLoadingStatus(false));
+        }
     };
 
     useEffect(() => { loadCal(); }, []);
+
+    const toggleAccountCollapse = (key: string) => {
+        setCollapsedAccounts(prev => {
+            const next = new Set(prev);
+            if (next.has(key)) next.delete(key);
+            else next.add(key);
+            return next;
+        });
+    };
 
     const handleCreateCalendar = async () => {
         if (!newCalName.trim()) {
             addNotification("Calendar", 'Please enter a calendar name.', 'error');
             return;
         }
+        if (!selectedAccountKey) {
+            addNotification("Calendar", 'Please select an account.', 'error');
+            return;
+        }
+        const [accountEmail, accountHost] = selectedAccountKey.split('|');
         setSaving(true);
         try {
-            await window.electron.calCreateCalendar({ displayName: newCalName.trim(), color: newCalColor });
+            await window.electron.calCreateCalendarForAccount({
+                accountEmail,
+                accountHost,
+                displayName: newCalName.trim(),
+                color: newCalColor,
+            });
             addNotification("Calendar", `Calendar "${newCalName}" created!`, 'success');
             setShowNewCalForm(false);
             setNewCalName('');
@@ -45,6 +73,8 @@ export const CalSideBarComponent = () => {
         }
         setSaving(false);
     };
+
+    const grouped = calendars.getCalendarsGroupedByAccount();
 
     return (
         <div className="cal-sidebar-container">
@@ -63,6 +93,22 @@ export const CalSideBarComponent = () => {
                         onChange={(e) => setNewCalName(e.target.value)}
                         className="new-cal-input"
                     />
+                    {grouped.length > 1 && (
+                        <select
+                            className="new-cal-input"
+                            value={selectedAccountKey}
+                            onChange={(e) => setSelectedAccountKey(e.target.value)}
+                        >
+                            {grouped.map(g => {
+                                const key = `${g.accountEmail}|${g.accountHost}`;
+                                return (
+                                    <option key={key} value={key}>
+                                        {g.accountLabel || g.accountEmail}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    )}
                     <div className="color-picker-row">
                         {PRESET_COLORS.map((c) => (
                             <button
@@ -85,25 +131,45 @@ export const CalSideBarComponent = () => {
                 </div>
             )}
 
-            <ul className="calendar-list">
-                {calendars.getCalendars().map(({ calendar, visibility }) => (
-                    <li key={String(calendar.ctag ?? calendar.url)} className="calendar-item">
-                        <span
-                            className="calendar-color-dot"
-                            style={{ background: calendar.calendarColor ?? '#808080' }}
-                        />
-                        <label className="calendar-label">
-                            {String(calendar.displayName ?? calendar.url)}
-                        </label>
-                        <input
-                            type="checkbox"
-                            checked={visibility}
-                            onChange={() => calendars.setCalendarVisibility(calendar)}
-                            className="calendar-checkbox"
-                        />
-                    </li>
-                ))}
-            </ul>
+            {grouped.map(group => {
+                const key = `${group.accountEmail}|${group.accountHost}`;
+                const isCollapsed = collapsedAccounts.has(key);
+                return (
+                    <div key={key} className="cal-account-section">
+                        <button
+                            className="cal-account-header"
+                            onClick={() => toggleAccountCollapse(key)}
+                        >
+                            {isCollapsed ? <FaChevronRight size={10} /> : <FaChevronDown size={10} />}
+                            <span className="cal-account-label">
+                                {group.accountLabel || group.accountEmail}
+                            </span>
+                        </button>
+                        {!isCollapsed && (
+                            <ul className="calendar-list">
+                                {group.entries.map(({ calendar, visibility }) => (
+                                    <li key={String(calendar.ctag ?? calendar.url)} className="calendar-item">
+                                        <span
+                                            className="calendar-color-dot"
+                                            style={{ background: calendar.calendarColor ?? '#808080' }}
+                                        />
+                                        <label className="calendar-label">
+                                            {String(calendar.displayName ?? calendar.url)}
+                                        </label>
+                                        <input
+                                            type="checkbox"
+                                            checked={visibility}
+                                            onChange={() => calendars.setCalendarVisibility(calendar)}
+                                            className="calendar-checkbox"
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 };
+

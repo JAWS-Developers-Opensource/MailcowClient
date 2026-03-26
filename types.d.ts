@@ -54,6 +54,13 @@ type Calendar = {
     reports: string[];
 };
 
+type AccountCalendarsResult = {
+    accountEmail: string;
+    accountHost: string;
+    accountLabel?: string;
+    calendars: DAVCalendar[];
+};
+
 // ─── Email (IMAP) ─────────────────────────────────────────────────────────────
 
 type ImapFolderList = {
@@ -171,6 +178,10 @@ type EventPayloadMapping = {
     calUpdateEvent: void;
     calDeleteEvent: void;
     calCreateCalendar: void;
+    calGetAllAccountCalendars: AccountCalendarsResult[];
+    calQueryCalendarForAccount: DAVCalendarObject[];
+    calCreateEventForAccount: void;
+    calCreateCalendarForAccount: void;
     // CardDAV
     cardCreateConn: void;
     cardFetchAddressBooks: DAVAddressBook[];
@@ -254,6 +265,26 @@ interface Window {
         }) => Promise<void>;
         calDeleteEvent: (calendarObject: DAVCalendarObject) => Promise<void>;
         calCreateCalendar: (params: { displayName: string; color?: string; description?: string }) => Promise<void>;
+        calGetAllAccountCalendars: () => Promise<AccountCalendarsResult[]>;
+        calQueryCalendarForAccount: (accountEmail: string, accountHost: string, calendar: DAVCalendar, month: number, year: number) => Promise<DAVCalendarObject[]>;
+        calCreateEventForAccount: (params: {
+            accountEmail: string;
+            accountHost: string;
+            calendar: DAVCalendar;
+            title: string;
+            description?: string;
+            location?: string;
+            startDate: string;
+            endDate: string;
+            allDay?: boolean;
+        }) => Promise<void>;
+        calCreateCalendarForAccount: (params: {
+            accountEmail: string;
+            accountHost: string;
+            displayName: string;
+            color?: string;
+            description?: string;
+        }) => Promise<void>;
         // CardDAV
         cardCreateConn: () => Promise<void>;
         cardFetchAddressBooks: () => Promise<DAVAddressBook[]>;
