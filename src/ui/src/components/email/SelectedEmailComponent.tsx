@@ -194,6 +194,8 @@ const SelectedEmailComponent: React.FC<Props> = ({
                 <button
                     className="selected-email-details-toggle"
                     onClick={() => setShowDetails(!showDetails)}
+                    aria-expanded={showDetails}
+                    aria-label="Toggle email details"
                 >
                     {showDetails ? '▾' : '▸'} Details
                 </button>

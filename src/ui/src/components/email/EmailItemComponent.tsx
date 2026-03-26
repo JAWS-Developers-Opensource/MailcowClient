@@ -5,19 +5,22 @@ import { ImapEmail } from '../../types/mail.types';
 const AVATAR_COLORS = ['#7c3aed','#db2777','#d97706','#059669','#2563eb','#dc2626','#0891b2','#65a30d'];
 
 export function getAvatarColor(str: string): string {
+    const sample = str.slice(0, 50);
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    for (let i = 0; i < sample.length; i++) {
+        hash = sample.charCodeAt(i) + ((hash << 5) - hash);
     }
     return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 export function parseSenderName(from: string): string {
-    const nameMatch = from.match(/^(.+?)\s*<[^>]+>/);
-    if (nameMatch) return nameMatch[1].trim().replace(/^["']|["']$/g, '');
-    const localMatch = from.match(/([^@<\s]+)@/);
+    const trimmed = from.trim();
+    if (!trimmed) return 'Unknown Sender';
+    const nameMatch = trimmed.match(/^(.+?)\s*<[^>]+>/);
+    if (nameMatch) return nameMatch[1].trim().replace(/^["']|["']$/g, '') || 'Unknown Sender';
+    const localMatch = trimmed.match(/([^@<\s]+)@/);
     if (localMatch) return localMatch[1];
-    return from;
+    return trimmed;
 }
 
 const EmailItemComponent = ({
