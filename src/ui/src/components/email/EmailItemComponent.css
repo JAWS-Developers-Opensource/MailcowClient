@@ -1,103 +1,125 @@
 .email-item {
     display: flex;
-    align-items: stretch;
-    background: var(--sidebar-background-color, #fff);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px 9px 14px;
     cursor: pointer;
-    transition: background 0.12s;
     position: relative;
-    border-radius: 10px;
+    border-left: 2px solid transparent;
+    border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.05));
+    transition: background 0.12s;
 }
 
-.email-item:hover { background: var(--hover-background-color, #f1f5fb); }
+.email-item:hover {
+    background: var(--hover-background-color, #f1f5fb);
+}
 
 .email-item--selected {
-    background: #eef4ff !important;
-    border-left: 3px solid var(--primary-color, #007bff);
+    background: var(--card-bg, #f5f3ff) !important;
+    border-left-color: var(--primary-color, #7c3aed);
 }
 
-.email-content {
-    flex: 1;
-    padding: 10px 12px;
-    overflow: hidden;
-}
-
-.email-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 3px;
-}
-
-.email-header-left {
-    flex: 1;
-    overflow: hidden;
-}
-
-.email-header-left h4 {
-    margin: 0 0 2px 0;
-    font-size: 0.88rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: var(--text-color, #2d3748);
-    font-weight: 500;
-}
-
-.email-item--unread .email-subject-unread {
+/* ── Avatar circle ─────────────────────────────────────────────────────────── */
+.email-item-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 0.9rem;
     font-weight: 700;
-    color: var(--text-color, #1a202c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0;
 }
 
-.email-from {
-    margin: 0;
-    font-size: 0.78rem;
-    color: #94a3b8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.email-header-right {
+/* ── Text body ─────────────────────────────────────────────────────────────── */
+.email-item-body {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 5px;
-    flex-shrink: 0;
+    gap: 2px;
 }
 
-.email-header-right small {
-    font-size: 0.72rem;
-    color: #b0bec5;
+.email-item-row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.email-item-sender {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color, #2d3748);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.email-item--unread .email-item-sender {
+    font-weight: 700;
+}
+
+.email-item-row1-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
 }
 
 .unread-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--primary-color, #007bff);
+    background: var(--primary-color, #7c3aed);
+    flex-shrink: 0;
 }
 
-.email-actions {
+.email-item-date {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.email-item-row2 {
     display: flex;
     align-items: center;
-    padding: 0 8px;
-    opacity: 0;
-    transition: opacity 0.15s;
+    min-width: 0;
 }
 
-.email-item:hover .email-actions { opacity: 1; }
+.email-item-subject {
+    font-size: 0.82rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-.action-delete {
+.email-item--unread .email-item-subject {
+    font-weight: 600;
+    color: var(--text-color, #2d3748);
+}
+
+/* ── Delete button (hover-reveal) ─────────────────────────────────────────── */
+.email-item-delete {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 28px;
     height: 28px;
+    border: none;
+    background: none;
     border-radius: 6px;
     color: #ef4444;
-    transition: background 0.15s;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
+    flex-shrink: 0;
 }
 
-.action-delete:hover { background: #fef2f2; }
+.email-item:hover .email-item-delete { opacity: 1; }
+.email-item-delete:hover { background: #fef2f2; }
+

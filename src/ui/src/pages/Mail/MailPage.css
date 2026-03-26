@@ -200,7 +200,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    border-bottom: 1px solid rgba(0,0,0,0.07);
     background: var(--sidebar-background-color, #fff);
     position: sticky;
     top: 0;

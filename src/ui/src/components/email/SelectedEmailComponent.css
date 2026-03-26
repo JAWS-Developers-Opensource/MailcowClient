@@ -6,14 +6,56 @@
     background: var(--sidebar-background-color, #fff);
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────────────────── */
-.selected-email-toolbar {
+/* ── Top section ─────────────────────────────────────────────────────────── */
+.selected-email-top {
+    padding: 16px 20px 0;
+    flex-shrink: 0;
+}
+
+/* ── Header row: sender avatar + name | action buttons ──────────────────── */
+.selected-email-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.selected-email-sender-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.selected-email-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.selected-email-sender-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color, #1a202c);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Actions (right side of header row) ──────────────────────────────────── */
+.selected-email-actions {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
-    background: var(--sidebar-background-color, #f8fafc);
     flex-shrink: 0;
     flex-wrap: wrap;
 }
@@ -56,7 +98,6 @@
 /* ── More menu ───────────────────────────────────────────────────────────── */
 .email-more-wrapper {
     position: relative;
-    margin-left: auto;
 }
 
 .email-more-menu {
@@ -115,12 +156,88 @@
     z-index: 201;
 }
 
+/* ── Subject ─────────────────────────────────────────────────────────────── */
+.selected-email-subject {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-color, #1a202c);
+    line-height: 1.35;
+}
+
+/* ── Details toggle ──────────────────────────────────────────────────────── */
+.selected-email-details-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #7c3aed;
+    margin-bottom: 6px;
+    transition: opacity 0.15s;
+}
+
+.selected-email-details-toggle:hover { opacity: 0.75; }
+
+/* ── Collapsible details panel ───────────────────────────────────────────── */
+.selected-email-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.selected-email-details--open {
+    max-height: 400px;
+}
+
+.selected-email-details-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 0 10px;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-color, #4a5568);
+}
+
+.detail-key {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: #94a3b8;
+}
+
+.detail-row code {
+    font-size: 0.78rem;
+    color: var(--text-color, #334155);
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.selected-email-divider {
+    height: 1px;
+    background: var(--border-color, rgba(0,0,0,0.08));
+    margin: 0 -20px;
+}
+
 /* ── Remote images bar ───────────────────────────────────────────────────── */
 .remote-images-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
+    padding: 8px 20px;
     background: #fefce8;
     border-bottom: 1px solid #fde68a;
     font-size: 0.82rem;
@@ -144,118 +261,6 @@
 }
 
 .remote-images-btn:hover { opacity: 0.85; }
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
-.selected-email-header {
-    padding: 18px 20px 14px;
-    border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
-    flex-shrink: 0;
-}
-
-.selected-email-subject {
-    margin: 0 0 12px 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-color, #1a202c);
-    line-height: 1.4;
-}
-
-.email-info-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-}
-
-.email-info-popup {
-    width: min(680px, 92vw);
-    max-height: 80vh;
-    overflow: auto;
-    background: var(--sidebar-background-color, #fff);
-    border: 1px solid var(--border-color, #d1d5db);
-    border-radius: 12px;
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
-    padding: 14px;
-}
-
-.email-info-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-.email-info-header h3 {
-    margin: 0;
-    font-size: 0.95rem;
-    color: var(--text-color, #111827);
-}
-
-.email-info-close {
-    border: 1px solid #cbd5e1;
-    background: #fff;
-    border-radius: 6px;
-    padding: 5px 10px;
-    font-size: 0.78rem;
-    cursor: pointer;
-}
-
-.email-info-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.email-info-row {
-    display: grid;
-    grid-template-columns: 92px 1fr;
-    align-items: start;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    background: var(--hover-background-color, #f8fafc);
-}
-
-.email-info-row span {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #64748b;
-}
-
-.email-info-row code {
-    font-size: 0.8rem;
-    color: var(--text-color, #334155);
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.selected-email-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.meta-row {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    font-size: 0.82rem;
-    color: var(--text-color, #4a5568);
-}
-
-.meta-key {
-    min-width: 36px;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
-    color: #94a3b8;
-}
 
 /* ── Body ────────────────────────────────────────────────────────────────── */
 .selected-email-body {
@@ -282,3 +287,4 @@
     line-height: 1.7;
     padding: 20px;
 }
+

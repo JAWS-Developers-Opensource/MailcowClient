@@ -6,9 +6,10 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import {
     FiCornerUpLeft, FiCornerUpRight, FiTrash2,
-    FiMoreHorizontal, FiEyeOff, FiFolderPlus, FiDownload, FiInfo,
+    FiMoreHorizontal, FiEyeOff, FiFolderPlus, FiDownload,
 } from 'react-icons/fi';
 import UILogger from '../../helpers/UILogger';
+import { getAvatarColor, parseSenderName } from './EmailItemComponent';
 
 interface Props {
     email: ImapEmailBody;
@@ -43,7 +44,7 @@ const SelectedEmailComponent: React.FC<Props> = ({
     const [showMore, setShowMore]         = useState(false);
     const [showMoveMenu, setShowMoveMenu] = useState(false);
     const [imagesAllowed, setImagesAllowed] = useState(false);
-    const [showInfo, setShowInfo] = useState(false);
+    const [showDetails, setShowDetails]   = useState(false);
 
     const replySubject = email.subject?.startsWith('Re:')  ? email.subject : `Re: ${email.subject ?? ''}`;
     const fwdSubject   = email.subject?.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject ?? ''}`;
@@ -96,6 +97,10 @@ const SelectedEmailComponent: React.FC<Props> = ({
         onMarkUnread?.();
     };
 
+    const senderName = parseSenderName(email.from ?? '');
+    const avatarLetter = senderName.charAt(0).toUpperCase();
+    const avatarColor = getAvatarColor(email.from ?? '');
+
     return (
         <div className="selected-email">
             {showReply && (
@@ -113,63 +118,99 @@ const SelectedEmailComponent: React.FC<Props> = ({
                 />
             )}
 
-            {/* ── Toolbar ────────────────────────────────────────── */}
-            <div className="selected-email-toolbar">
-                <button className="email-action-btn" onClick={() => setShowReply(true)}>
-                    <FiCornerUpLeft size={13} /> {t('mail.reply')}
-                </button>
-                <button className="email-action-btn" onClick={() => setShowForward(true)}>
-                    <FiCornerUpRight size={13} /> {t('mail.forward')}
-                </button>
-                {onDelete && (
-                    <button className="email-action-btn email-action-btn--danger" onClick={onDelete}>
-                        <FiTrash2 size={13} /> {t('mail.delete')}
-                    </button>
-                )}
-                <button className="email-action-btn" onClick={() => setShowInfo(true)}>
-                    <FiInfo size={13} /> Info
-                </button>
+            {/* ── Top section (header + subject + details) ─────────────── */}
+            <div className="selected-email-top">
 
-                {/* More actions */}
-                <div className="email-more-wrapper">
-                    <button
-                        className="email-action-btn email-action-btn--icon"
-                        onClick={() => { setShowMore(!showMore); setShowMoveMenu(false); }}
-                        title="More actions"
-                    >
-                        <FiMoreHorizontal size={14} />
-                    </button>
-                    {showMore && (
-                        <div className="email-more-menu">
-                            {onMarkUnread && (
-                                <button className="email-more-item" onClick={handleMarkUnread}>
-                                    <FiEyeOff size={13} /> {t('mail.markUnread')}
-                                </button>
-                            )}
-                            {onMove && folders.length > 0 && (
-                                <div className="email-more-item email-more-item--submenu"
-                                    onMouseEnter={() => setShowMoveMenu(true)}
-                                    onMouseLeave={() => setShowMoveMenu(false)}
-                                >
-                                    <FiFolderPlus size={13} /> {t('mail.moveTo')}
-                                    {showMoveMenu && (
-                                        <div className="email-move-submenu">
-                                            {folders.filter((f) => f !== folder).slice(0, 20).map((f) => (
-                                                <button
-                                                    key={f}
-                                                    className="email-more-item"
-                                                    onClick={() => handleMove(f)}
-                                                >
-                                                    {f.split(/[./]/).pop()}
-                                                </button>
-                                            ))}
+                {/* Header row: avatar + sender name | action buttons */}
+                <div className="selected-email-header-row">
+                    <div className="selected-email-sender-info">
+                        <div className="selected-email-avatar" style={{ background: avatarColor }}>
+                            {avatarLetter}
+                        </div>
+                        <span className="selected-email-sender-name">{senderName}</span>
+                    </div>
+
+                    <div className="selected-email-actions">
+                        <button className="email-action-btn" onClick={() => setShowReply(true)}>
+                            <FiCornerUpLeft size={13} /> {t('mail.reply')}
+                        </button>
+                        <button className="email-action-btn" onClick={() => setShowForward(true)}>
+                            <FiCornerUpRight size={13} /> {t('mail.forward')}
+                        </button>
+                        {onDelete && (
+                            <button className="email-action-btn email-action-btn--danger" onClick={onDelete}>
+                                <FiTrash2 size={13} /> {t('mail.delete')}
+                            </button>
+                        )}
+
+                        {/* More actions */}
+                        <div className="email-more-wrapper">
+                            <button
+                                className="email-action-btn email-action-btn--icon"
+                                onClick={() => { setShowMore(!showMore); setShowMoveMenu(false); }}
+                                title="More actions"
+                            >
+                                <FiMoreHorizontal size={14} />
+                            </button>
+                            {showMore && (
+                                <div className="email-more-menu">
+                                    {onMarkUnread && (
+                                        <button className="email-more-item" onClick={handleMarkUnread}>
+                                            <FiEyeOff size={13} /> {t('mail.markUnread')}
+                                        </button>
+                                    )}
+                                    {onMove && folders.length > 0 && (
+                                        <div
+                                            className="email-more-item email-more-item--submenu"
+                                            onMouseEnter={() => setShowMoveMenu(true)}
+                                            onMouseLeave={() => setShowMoveMenu(false)}
+                                        >
+                                            <FiFolderPlus size={13} /> {t('mail.moveTo')}
+                                            {showMoveMenu && (
+                                                <div className="email-move-submenu">
+                                                    {folders.filter((f) => f !== folder).slice(0, 20).map((f) => (
+                                                        <button
+                                                            key={f}
+                                                            className="email-more-item"
+                                                            onClick={() => handleMove(f)}
+                                                        >
+                                                            {f.split(/[./]/).pop()}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             )}
                         </div>
-                    )}
+                    </div>
                 </div>
+
+                {/* Subject */}
+                <h2 className="selected-email-subject">{email.subject}</h2>
+
+                {/* Collapsible details toggle */}
+                <button
+                    className="selected-email-details-toggle"
+                    onClick={() => setShowDetails(!showDetails)}
+                >
+                    {showDetails ? '▾' : '▸'} Details
+                </button>
+
+                <div className={`selected-email-details${showDetails ? ' selected-email-details--open' : ''}`}>
+                    <div className="selected-email-details-inner">
+                        <div className="detail-row"><span className="detail-key">From</span><span>{email.from}</span></div>
+                        {email.to   && <div className="detail-row"><span className="detail-key">To</span><span>{email.to}</span></div>}
+                        {email.date && <div className="detail-row"><span className="detail-key">Date</span><span>{new Date(email.date).toLocaleString()}</span></div>}
+                        {email.uid  !== undefined && <div className="detail-row"><span className="detail-key">UID</span><code>{email.uid}</code></div>}
+                        {host    && <div className="detail-row"><span className="detail-key">Server</span><code>{host}</code></div>}
+                        {mailbox && <div className="detail-row"><span className="detail-key">Mailbox</span><code>{mailbox}</code></div>}
+                        {folder  && <div className="detail-row"><span className="detail-key">Folder</span><code>{folder}</code></div>}
+                    </div>
+                </div>
+
+                <div className="selected-email-divider" />
             </div>
 
             {/* ── Remote images notice ───────────────────────────── */}
@@ -185,16 +226,6 @@ const SelectedEmailComponent: React.FC<Props> = ({
                 </div>
             )}
 
-            {/* ── Header ─────────────────────────────────────────── */}
-            <div className="selected-email-header">
-                <h2 className="selected-email-subject">{email.subject}</h2>
-                <div className="selected-email-meta">
-                    <div className="meta-row"><span className="meta-key">From</span><span>{email.from}</span></div>
-                    {email.to && <div className="meta-row"><span className="meta-key">To</span><span>{email.to}</span></div>}
-                    {email.date && <div className="meta-row"><span className="meta-key">Date</span><span>{new Date(email.date).toLocaleString()}</span></div>}
-                </div>
-            </div>
-
             {/* ── Body ───────────────────────────────────────────── */}
             <div className="selected-email-body">
                 {email.bodyHtml ? (
@@ -208,27 +239,6 @@ const SelectedEmailComponent: React.FC<Props> = ({
                     <pre className="email-text">{email.bodyText}</pre>
                 )}
             </div>
-
-            {showInfo && (
-                <div className="email-info-overlay" onClick={() => setShowInfo(false)}>
-                    <div className="email-info-popup" onClick={(e) => e.stopPropagation()}>
-                        <div className="email-info-header">
-                            <h3>Email Info</h3>
-                            <button className="email-info-close" onClick={() => setShowInfo(false)}>Close</button>
-                        </div>
-                        <div className="email-info-grid">
-                            <div className="email-info-row"><span>UID</span><code>{email.uid ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Server</span><code>{host ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Mailbox</span><code>{mailbox ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Folder</span><code>{folder ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>From</span><code>{email.from ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>To</span><code>{email.to ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Date</span><code>{email.date ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Subject</span><code>{email.subject ?? 'n/a'}</code></div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
