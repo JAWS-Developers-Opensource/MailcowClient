@@ -46,17 +46,12 @@ const EmailItemComponent = ({
 
     const isUnread = !email.flags.includes('\\Seen');
     const senderName = parseSenderName(email.from);
-    const avatarLetter = senderName.charAt(0).toUpperCase();
-    const avatarColor = getAvatarColor(email.from);
 
     return (
         <div
             className={`email-item${selected ? ' email-item--selected' : ''}${isUnread ? ' email-item--unread' : ''}`}
             onClick={onSelect}
         >
-            <div className="email-item-avatar" style={{ background: avatarColor }}>
-                {avatarLetter}
-            </div>
             <div className="email-item-body">
                 <div className="email-item-row1">
                     <span className="email-item-sender">{senderName}</span>

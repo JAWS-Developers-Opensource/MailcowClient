@@ -55,11 +55,11 @@ const SelectedEmailComponent: React.FC<Props> = ({
         + `<strong>Subject:</strong> ${email.subject ?? ''}</p>`
         + (email.bodyHtml ?? `<pre>${email.bodyText ?? ''}</pre>`);
 
-    // Detect if email HTML contains remote images
-    const hasRemoteImages = useMemo(() =>
-        !!(email.bodyHtml && /src=["']https?:\/\//i.test(email.bodyHtml)),
-        [email.bodyHtml],
-    );
+    // Detect if email content contains remote images
+    const hasRemoteImages = useMemo(() => {
+        const content = email.bodyHtml ?? email.bodyText ?? '';
+        return /src=["']https?:\/\//i.test(content);
+    }, [email.bodyHtml, email.bodyText]);
 
     // Wrap bare HTML fragments in a full document so that fonts, layout and
     // viewport styles are applied correctly inside the sandboxed iframe.
@@ -80,10 +80,25 @@ const SelectedEmailComponent: React.FC<Props> = ({
     };
 
     const processedHtml = useMemo(() => {
-        if (!email.bodyHtml) return '';
-        const raw = imagesAllowed ? email.bodyHtml : blockRemoteImages(email.bodyHtml);
-        return wrapHtml(raw);
-    }, [email.bodyHtml, imagesAllowed]);
+        if (email.bodyHtml) {
+            const raw = imagesAllowed ? email.bodyHtml : blockRemoteImages(email.bodyHtml);
+            return wrapHtml(raw);
+        }
+        // If only plain text is available, render it in the iframe too so the
+        // user never sees raw HTML tags (some servers put HTML in the text part).
+        if (email.bodyText) {
+            const looksLikeHtml = /<[a-z][\s\S]*>/i.test(email.bodyText);
+            if (looksLikeHtml) {
+                const raw = imagesAllowed ? email.bodyText : blockRemoteImages(email.bodyText);
+                return wrapHtml(raw);
+            }
+            // Pure plain text — wrap in pre so whitespace is preserved
+            return wrapHtml(`<pre style="white-space:pre-wrap;word-break:break-word;font-size:0.9em">${
+                email.bodyText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            }</pre>`);
+        }
+        return '';
+    }, [email.bodyHtml, email.bodyText, imagesAllowed]);
 
     const handleMove = (toFolder: string) => {
         setShowMoveMenu(false);
@@ -230,16 +245,12 @@ const SelectedEmailComponent: React.FC<Props> = ({
 
             {/* ── Body ───────────────────────────────────────────── */}
             <div className="selected-email-body">
-                {email.bodyHtml ? (
-                    <iframe
-                        className="email-iframe"
-                        srcDoc={processedHtml}
-                        sandbox=""
-                        title="Email body"
-                    />
-                ) : (
-                    <pre className="email-text">{email.bodyText}</pre>
-                )}
+                <iframe
+                    className="email-iframe"
+                    srcDoc={processedHtml}
+                    sandbox=""
+                    title="Email body"
+                />
             </div>
         </div>
     );

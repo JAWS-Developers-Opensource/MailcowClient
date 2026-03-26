@@ -1,8 +1,8 @@
 .email-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 9px 12px 9px 14px;
+    gap: 0;
+    padding: 8px 12px 8px 16px;
     cursor: pointer;
     position: relative;
     border-left: 2px solid transparent;
@@ -17,21 +17,6 @@
 .email-item--selected {
     background: var(--card-bg, #f5f3ff) !important;
     border-left-color: var(--primary-color, #7c3aed);
-}
-
-/* ── Avatar circle ─────────────────────────────────────────────────────────── */
-.email-item-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    letter-spacing: 0;
 }
 
 /* ── Text body ─────────────────────────────────────────────────────────────── */
