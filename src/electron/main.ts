@@ -61,17 +61,23 @@ app.on('ready', () => {
 
     // ── Harden session before any window loads ────────────────────────────────
 
-    // Inject CSP + X-Content-Type-Options on all HTTP(S) renderer responses
-    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-        callback({
-            responseHeaders: {
-                ...details.responseHeaders,
-                'Content-Security-Policy': [CSP],
-                'X-Content-Type-Options': ['nosniff'],
-                'X-Frame-Options': ['DENY'],
-            },
+    // Inject CSP + X-Content-Type-Options on all HTTP(S) renderer responses.
+    // In development mode the Vite dev server injects inline scripts for React
+    // Fast Refresh (HMR preamble) which would be blocked by script-src 'self'.
+    // CSP is therefore only enforced in production; contextIsolation + sandbox
+    // guards are still active in both modes.
+    if (!isDev()) {
+        session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+            callback({
+                responseHeaders: {
+                    ...details.responseHeaders,
+                    'Content-Security-Policy': [CSP],
+                    'X-Content-Type-Options': ['nosniff'],
+                    'X-Frame-Options': ['DENY'],
+                },
+            });
         });
-    });
+    }
 
     // Deny all browser-level permission requests (camera, mic, location, notifications…)
     session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => {
