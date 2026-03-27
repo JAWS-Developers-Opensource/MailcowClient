@@ -199,15 +199,16 @@
 /* ── Body ────────────────────────────────────────────────────────────────── */
 .selected-email-body {
     flex: 1;
-    overflow: hidden;
+    overflow: auto;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 .email-iframe {
     width: 100%;
     flex: 1;
-    min-height: 0;
+    min-height: 300px;
     border: none;
     background: #fff;
     display: block;
