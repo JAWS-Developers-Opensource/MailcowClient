@@ -23,9 +23,9 @@ async function getConnection(credentials: { email: string; password: string; hos
                 host: credentials.host,
                 port: 993,
                 tls: true,
-                // NOTE: self-hosted Mailcow instances often use self-signed certificates.
-                // Set MAILCOW_TLS_STRICT=1 in the environment to enforce full validation.
-                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_STRICT === "1" },
+                // TLS certificate validation is ENABLED by default.
+                // Set MAILCOW_TLS_SKIP_VERIFY=1 only for self-signed-cert dev servers.
+                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_SKIP_VERIFY !== '1' },
             },
             connectTimeout: 20000,
         };
@@ -60,8 +60,9 @@ export class ImapManager {
                 host: params.host,
                 port: 993,
                 tls: true,
-                // NOTE: self-hosted Mailcow instances often use self-signed certificates.
-                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_STRICT === "1" },
+                // TLS certificate validation is ENABLED by default.
+                // Set MAILCOW_TLS_SKIP_VERIFY=1 only for self-signed-cert dev servers.
+                tlsOptions: { rejectUnauthorized: process.env.MAILCOW_TLS_SKIP_VERIFY !== '1' },
             },
             connectTimeout: 20000,
         };
@@ -190,14 +191,41 @@ export async function fetchEmailBody(params: {
         const fullBody = msg.parts.find((p: any) => p.which === '')?.body ?? '';
         const header = msg.parts.find((p: any) => p.which === 'HEADER')?.body ?? {};
 
+        // The '' (RFC822) body part contains the full raw message (headers + body).
+        // Split it at the first blank line to separate raw headers from body content.
+        // Support both CRLF (\r\n\r\n) and LF-only (\n\n) line endings.
+        // Find the earliest occurrence of either separator.
+        let rawBody = fullBody;
+        let rawHeaders = '';
+        if (fullBody) {
+            const crlfIdx = fullBody.indexOf('\r\n\r\n');
+            const lfIdx   = fullBody.indexOf('\n\n');
+
+            // Pick the separator that occurs first; prefer CRLF if at same position
+            let sep = -1;
+            let skip = 0;
+            if (crlfIdx >= 0 && (lfIdx < 0 || crlfIdx <= lfIdx)) {
+                sep = crlfIdx;
+                skip = 4;
+            } else if (lfIdx >= 0) {
+                sep = lfIdx;
+                skip = 2;
+            }
+
+            if (sep >= 0) {
+                rawHeaders = fullBody.slice(0, sep);
+                rawBody = fullBody.slice(sep + skip);
+            }
+        }
+
         // Prefer HTML body
         let bodyHtml = '';
         let bodyText = '';
-        if (fullBody) {
-            if (fullBody.toLowerCase().includes('<html')) {
-                bodyHtml = fullBody;
+        if (rawBody) {
+            if (rawBody.toLowerCase().includes('<html')) {
+                bodyHtml = rawBody;
             } else {
-                bodyText = fullBody;
+                bodyText = rawBody;
             }
         } else {
             bodyText = textBody;
@@ -212,6 +240,7 @@ export async function fetchEmailBody(params: {
             date: header.date?.[0] ?? '',
             bodyText,
             bodyHtml,
+            rawHeaders: rawHeaders || undefined,
         };
     } catch (error: any) {
         return { success: false, error: error.message };

@@ -3,12 +3,12 @@ import './SelectedEmailComponent.css';
 import { ImapEmailBody } from '../../types/mail.types';
 import ComposeEmailComponent from './ComposeEmailComponent';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useNotification } from '../../contexts/NotificationContext';
 import {
     FiCornerUpLeft, FiCornerUpRight, FiTrash2,
     FiMoreHorizontal, FiEyeOff, FiFolderPlus, FiDownload, FiInfo,
 } from 'react-icons/fi';
 import UILogger from '../../helpers/UILogger';
+import { getAvatarColor, parseSenderName } from './EmailItemComponent';
 
 interface Props {
     email: ImapEmailBody;
@@ -33,17 +33,16 @@ function blockRemoteImages(html: string): string {
 }
 
 const SelectedEmailComponent: React.FC<Props> = ({
-    email, onDelete, onMove, onMarkUnread, folders = [], folder, mailbox, host,
+    email, onDelete, onMove, onMarkUnread, folders = [], folder,
 }) => {
     const { t } = useLanguage();
-    const { addNotification } = useNotification();
 
     const [showReply, setShowReply]       = useState(false);
     const [showForward, setShowForward]   = useState(false);
     const [showMore, setShowMore]         = useState(false);
     const [showMoveMenu, setShowMoveMenu] = useState(false);
     const [imagesAllowed, setImagesAllowed] = useState(false);
-    const [showInfo, setShowInfo] = useState(false);
+    const [showRawHeaders, setShowRawHeaders] = useState(false);
 
     const replySubject = email.subject?.startsWith('Re:')  ? email.subject : `Re: ${email.subject ?? ''}`;
     const fwdSubject   = email.subject?.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject ?? ''}`;
@@ -54,16 +53,50 @@ const SelectedEmailComponent: React.FC<Props> = ({
         + `<strong>Subject:</strong> ${email.subject ?? ''}</p>`
         + (email.bodyHtml ?? `<pre>${email.bodyText ?? ''}</pre>`);
 
-    // Detect if email HTML contains remote images
-    const hasRemoteImages = useMemo(() =>
-        !!(email.bodyHtml && /src=["']https?:\/\//i.test(email.bodyHtml)),
-        [email.bodyHtml],
-    );
+    // Detect if email content contains remote images
+    const hasRemoteImages = useMemo(() => {
+        const content = email.bodyHtml ?? email.bodyText ?? '';
+        return /src=["']https?:\/\//i.test(content);
+    }, [email.bodyHtml, email.bodyText]);
+
+    // Wrap bare HTML fragments in a full document so that fonts, layout and
+    // viewport styles are applied correctly inside the sandboxed iframe.
+    const wrapHtml = (html: string): string => {
+        const isFullDoc = /^\s*<!DOCTYPE|^\s*<html/i.test(html);
+        if (isFullDoc) return html;
+        return `<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#222;margin:0;padding:20px;word-wrap:break-word;overflow-x:auto}
+  a{color:#2563eb}img{max-width:100%;height:auto}
+  table{border-collapse:collapse;max-width:100%}
+  pre,code{white-space:pre-wrap;word-break:break-all;font-size:0.88em}
+  blockquote{border-left:3px solid #cbd5e1;margin:8px 0;padding:4px 12px;color:#64748b}
+</style>
+</head><body>${html}</body></html>`;
+    };
 
     const processedHtml = useMemo(() => {
-        if (!email.bodyHtml) return '';
-        return imagesAllowed ? email.bodyHtml : blockRemoteImages(email.bodyHtml);
-    }, [email.bodyHtml, imagesAllowed]);
+        if (email.bodyHtml) {
+            const raw = imagesAllowed ? email.bodyHtml : blockRemoteImages(email.bodyHtml);
+            return wrapHtml(raw);
+        }
+        // If only plain text is available, render it in the iframe too so the
+        // user never sees raw HTML tags (some servers put HTML in the text part).
+        if (email.bodyText) {
+            const looksLikeHtml = /<[a-z][\s\S]*>/i.test(email.bodyText);
+            if (looksLikeHtml) {
+                const raw = imagesAllowed ? email.bodyText : blockRemoteImages(email.bodyText);
+                return wrapHtml(raw);
+            }
+            // Pure plain text — wrap in pre so whitespace is preserved
+            return wrapHtml(`<pre style="white-space:pre-wrap;word-break:break-word;font-size:0.9em">${
+                email.bodyText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            }</pre>`);
+        }
+        return '';
+    }, [email.bodyHtml, email.bodyText, imagesAllowed]);
 
     const handleMove = (toFolder: string) => {
         setShowMoveMenu(false);
@@ -76,6 +109,15 @@ const SelectedEmailComponent: React.FC<Props> = ({
         setShowMore(false);
         onMarkUnread?.();
     };
+
+    const handleToggleDetails = () => {
+        setShowRawHeaders((prev) => !prev);
+        setShowMore(false);
+    };
+
+    const senderName = parseSenderName(email.from ?? '');
+    const avatarLetter = senderName.charAt(0).toUpperCase();
+    const avatarColor = getAvatarColor(email.from ?? '');
 
     return (
         <div className="selected-email">
@@ -94,64 +136,95 @@ const SelectedEmailComponent: React.FC<Props> = ({
                 />
             )}
 
-            {/* ── Toolbar ────────────────────────────────────────── */}
-            <div className="selected-email-toolbar">
-                <button className="email-action-btn" onClick={() => setShowReply(true)}>
-                    <FiCornerUpLeft size={13} /> {t('mail.reply')}
-                </button>
-                <button className="email-action-btn" onClick={() => setShowForward(true)}>
-                    <FiCornerUpRight size={13} /> {t('mail.forward')}
-                </button>
-                {onDelete && (
-                    <button className="email-action-btn email-action-btn--danger" onClick={onDelete}>
-                        <FiTrash2 size={13} /> {t('mail.delete')}
-                    </button>
-                )}
-                <button className="email-action-btn" onClick={() => setShowInfo(true)}>
-                    <FiInfo size={13} /> Info
-                </button>
+            {/* ── Top section: subject + floating action toolbar ────────── */}
+            <div className="selected-email-top">
+                <div className="selected-email-header-row">
+                    <div className="selected-email-sender-info">
+                        <div className="selected-email-avatar" style={{ background: avatarColor }}>
+                            {avatarLetter}
+                        </div>
+                        <h2 className="selected-email-subject">{email.subject}</h2>
+                    </div>
 
-                {/* More actions */}
-                <div className="email-more-wrapper">
-                    <button
-                        className="email-action-btn email-action-btn--icon"
-                        onClick={() => { setShowMore(!showMore); setShowMoveMenu(false); }}
-                        title="More actions"
-                    >
-                        <FiMoreHorizontal size={14} />
-                    </button>
-                    {showMore && (
-                        <div className="email-more-menu">
-                            {onMarkUnread && (
-                                <button className="email-more-item" onClick={handleMarkUnread}>
-                                    <FiEyeOff size={13} /> {t('mail.markUnread')}
-                                </button>
-                            )}
-                            {onMove && folders.length > 0 && (
-                                <div className="email-more-item email-more-item--submenu"
-                                    onMouseEnter={() => setShowMoveMenu(true)}
-                                    onMouseLeave={() => setShowMoveMenu(false)}
-                                >
-                                    <FiFolderPlus size={13} /> {t('mail.moveTo')}
-                                    {showMoveMenu && (
-                                        <div className="email-move-submenu">
-                                            {folders.filter((f) => f !== folder).slice(0, 20).map((f) => (
-                                                <button
-                                                    key={f}
-                                                    className="email-more-item"
-                                                    onClick={() => handleMove(f)}
-                                                >
-                                                    {f.split(/[./]/).pop()}
-                                                </button>
-                                            ))}
+                    <div className="selected-email-actions">
+                        <button className="email-action-btn" onClick={() => setShowReply(true)}>
+                            <FiCornerUpLeft size={13} /> {t('mail.reply')}
+                        </button>
+                        <button className="email-action-btn" onClick={() => setShowForward(true)}>
+                            <FiCornerUpRight size={13} /> {t('mail.forward')}
+                        </button>
+                        {onDelete && (
+                            <button className="email-action-btn email-action-btn--danger" onClick={onDelete}>
+                                <FiTrash2 size={13} /> {t('mail.delete')}
+                            </button>
+                        )}
+
+                        {/* More actions */}
+                        <div className="email-more-wrapper">
+                            <button
+                                className="email-action-btn email-action-btn--icon"
+                                onClick={() => { setShowMore(!showMore); setShowMoveMenu(false); }}
+                                title="More actions"
+                            >
+                                <FiMoreHorizontal size={14} />
+                            </button>
+                            {showMore && (
+                                <div className="email-more-menu">
+                                    {onMarkUnread && (
+                                        <button className="email-more-item" onClick={handleMarkUnread}>
+                                            <FiEyeOff size={13} /> {t('mail.markUnread')}
+                                        </button>
+                                    )}
+                                    {email.rawHeaders && (
+                                        <button className="email-more-item" onClick={handleToggleDetails}>
+                                            <FiInfo size={13} /> {t('mail.details')}
+                                        </button>
+                                    )}
+                                    {onMove && folders.length > 0 && (
+                                        <div
+                                            className="email-more-item email-more-item--submenu"
+                                            onMouseEnter={() => setShowMoveMenu(true)}
+                                            onMouseLeave={() => setShowMoveMenu(false)}
+                                        >
+                                            <FiFolderPlus size={13} /> {t('mail.moveTo')}
+                                            {showMoveMenu && (
+                                                <div className="email-move-submenu">
+                                                    {folders.filter((f) => f !== folder).slice(0, 20).map((f) => (
+                                                        <button
+                                                            key={f}
+                                                            className="email-more-item"
+                                                            onClick={() => handleMove(f)}
+                                                        >
+                                                            {f.split(/[./]/).pop()}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             )}
                         </div>
-                    )}
+                    </div>
                 </div>
+
+                <div className="selected-email-divider" />
             </div>
+
+            {/* ── Raw headers panel (shown when Details is toggled) ──── */}
+            {showRawHeaders && email.rawHeaders && (
+                <div className="raw-headers-panel">
+                    <div className="raw-headers-toolbar">
+                        <span className="raw-headers-title">Raw Headers</span>
+                        <button
+                            className="raw-headers-close"
+                            onClick={() => setShowRawHeaders(false)}
+                            aria-label="Close details"
+                        >✕</button>
+                    </div>
+                    <pre className="raw-headers-pre">{email.rawHeaders}</pre>
+                </div>
+            )}
 
             {/* ── Remote images notice ───────────────────────────── */}
             {hasRemoteImages && !imagesAllowed && (
@@ -166,45 +239,15 @@ const SelectedEmailComponent: React.FC<Props> = ({
                 </div>
             )}
 
-            {/* ── Header ─────────────────────────────────────────── */}
-            <div className="selected-email-header">
-                <h2 className="selected-email-subject">{email.subject}</h2>
-            </div>
-
             {/* ── Body ───────────────────────────────────────────── */}
             <div className="selected-email-body">
-                {email.bodyHtml ? (
-                    <iframe
-                        className="email-iframe"
-                        srcDoc={processedHtml}
-                        sandbox=""
-                        title="Email body"
-                    />
-                ) : (
-                    <pre className="email-text">{email.bodyText}</pre>
-                )}
+                <iframe
+                    className="email-iframe"
+                    srcDoc={processedHtml}
+                    sandbox=""
+                    title="Email body"
+                />
             </div>
-
-            {showInfo && (
-                <div className="email-info-overlay" onClick={() => setShowInfo(false)}>
-                    <div className="email-info-popup" onClick={(e) => e.stopPropagation()}>
-                        <div className="email-info-header">
-                            <h3>Email Info</h3>
-                            <button className="email-info-close" onClick={() => setShowInfo(false)}>Close</button>
-                        </div>
-                        <div className="email-info-grid">
-                            <div className="email-info-row"><span>UID</span><code>{email.uid ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Server</span><code>{host ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Mailbox</span><code>{mailbox ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Folder</span><code>{folder ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>From</span><code>{email.from ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>To</span><code>{email.to ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Date</span><code>{email.date ?? 'n/a'}</code></div>
-                            <div className="email-info-row"><span>Subject</span><code>{email.subject ?? 'n/a'}</code></div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

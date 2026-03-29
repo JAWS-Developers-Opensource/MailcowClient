@@ -118,3 +118,9 @@ export const switchAccount = async (params: { email: string; host: string }): Pr
     if (!target) return;
     await saveCredentials(target);
 };
+
+// Internal export for caldav multi-account loading (never sent to renderer)
+export type StoredAccountCredentials = { email: string; password: string; host: string; label?: string };
+export const getAccountsWithCredentials = async (): Promise<StoredAccountCredentials[]> => {
+    return getAllAccounts();
+};

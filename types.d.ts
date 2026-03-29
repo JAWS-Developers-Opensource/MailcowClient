@@ -11,6 +11,17 @@ type UserCredentials = {
     host: string;
 };
 
+/** Subset of UserCredentials safe to expose to the renderer (no password). */
+type PublicCredentials = {
+    email: string;
+    host: string;
+};
+
+/** Result returned by the main-process autoLogin handler. */
+type AutoLoginResult =
+    | { success: true; email: string; method: 'imap' | 'oauth2' }
+    | { success: false };
+
 type OAuth2Credentials = {
     host: string;
     clientId: string;
@@ -41,6 +52,13 @@ type Calendar = {
     syncToken: number;
     projectedProps: object;
     reports: string[];
+};
+
+type AccountCalendarsResult = {
+    accountEmail: string;
+    accountHost: string;
+    accountLabel?: string;
+    calendars: DAVCalendar[];
 };
 
 // ─── Email (IMAP) ─────────────────────────────────────────────────────────────
@@ -78,6 +96,7 @@ type ImapEmailBody = {
     date?: string;
     bodyText?: string;
     bodyHtml?: string;
+    rawHeaders?: string;
     error?: string;
 };
 
@@ -100,6 +119,12 @@ type ParsedContact = {
     phone: string;
     company: string;
     notes: string;
+    title?: string;
+    birthday?: string;
+    address?: string;
+    city?: string;
+    country?: string;
+    website?: string;
     url?: string;
     etag?: string;
 };
@@ -128,8 +153,9 @@ type EventPayloadMapping = {
     // Auth / credentials
     imapCheckCredentials: ImapLogin;
     saveUserCredentials: UserCredentials;
-    getUserCredentials: UserCredentials;
+    getUserCredentials: PublicCredentials;
     removeUserCredentials: void;
+    autoLogin: AutoLoginResult;
     // OAuth2
     checkOAuth2Available: OAuth2AvailabilityResult;
     startOAuth2Login: OAuth2LoginResult;
@@ -153,6 +179,10 @@ type EventPayloadMapping = {
     calUpdateEvent: void;
     calDeleteEvent: void;
     calCreateCalendar: void;
+    calGetAllAccountCalendars: AccountCalendarsResult[];
+    calQueryCalendarForAccount: DAVCalendarObject[];
+    calCreateEventForAccount: void;
+    calCreateCalendarForAccount: void;
     // CardDAV
     cardCreateConn: void;
     cardFetchAddressBooks: DAVAddressBook[];
@@ -186,8 +216,9 @@ interface Window {
         // Auth
         imapCheckCredentials: (email: string, password: string, host: string) => Promise<ImapLogin>;
         saveUserCredentials: (userCredentials: UserCredentials) => void;
-        getUserCredentials: () => Promise<UserCredentials>;
+        getUserCredentials: () => Promise<PublicCredentials>;
         removeUserCredentials: () => Promise<void>;
+        autoLogin: () => Promise<AutoLoginResult>;
         // OAuth2
         checkOAuth2Available: (host: string) => Promise<OAuth2AvailabilityResult>;
         startOAuth2Login: (host: string, clientId: string, clientSecret?: string) => Promise<OAuth2LoginResult>;
@@ -235,6 +266,26 @@ interface Window {
         }) => Promise<void>;
         calDeleteEvent: (calendarObject: DAVCalendarObject) => Promise<void>;
         calCreateCalendar: (params: { displayName: string; color?: string; description?: string }) => Promise<void>;
+        calGetAllAccountCalendars: () => Promise<AccountCalendarsResult[]>;
+        calQueryCalendarForAccount: (accountEmail: string, accountHost: string, calendar: DAVCalendar, month: number, year: number) => Promise<DAVCalendarObject[]>;
+        calCreateEventForAccount: (params: {
+            accountEmail: string;
+            accountHost: string;
+            calendar: DAVCalendar;
+            title: string;
+            description?: string;
+            location?: string;
+            startDate: string;
+            endDate: string;
+            allDay?: boolean;
+        }) => Promise<void>;
+        calCreateCalendarForAccount: (params: {
+            accountEmail: string;
+            accountHost: string;
+            displayName: string;
+            color?: string;
+            description?: string;
+        }) => Promise<void>;
         // CardDAV
         cardCreateConn: () => Promise<void>;
         cardFetchAddressBooks: () => Promise<DAVAddressBook[]>;
@@ -247,6 +298,12 @@ interface Window {
             phone?: string;
             company?: string;
             notes?: string;
+            title?: string;
+            birthday?: string;
+            address?: string;
+            city?: string;
+            country?: string;
+            website?: string;
         }) => Promise<void>;
         cardUpdateContact: (params: {
             vCard: DAVVCard;
@@ -256,6 +313,12 @@ interface Window {
             phone?: string;
             company?: string;
             notes?: string;
+            title?: string;
+            birthday?: string;
+            address?: string;
+            city?: string;
+            country?: string;
+            website?: string;
         }) => Promise<void>;
         cardDeleteContact: (vCard: DAVVCard) => Promise<void>;
         // Settings

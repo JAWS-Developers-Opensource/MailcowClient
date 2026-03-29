@@ -4,7 +4,7 @@
     flex: 1;
     height: 100%;
     min-height: 0;
-    background: var(--background-color, #f0f2f5);
+    background: var(--background-color, #f0f4ff);
     overflow: hidden;
 }
 
@@ -13,7 +13,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #a0aec0;
+    color: var(--text-muted, #6b7280);
     font-size: 1rem;
 }
 
@@ -22,11 +22,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    background: var(--sidebar-background-color, #fff);
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 12px 20px;
+    background: var(--card-bg, #fff);
+    border-bottom: 1px solid var(--border-color, #e0e7ff);
     flex-shrink: 0;
     gap: 12px;
+    box-shadow: 0 2px 12px rgba(124,58,237,0.06);
 }
 
 .cal-toolbar-left, .cal-toolbar-right {
@@ -42,120 +43,145 @@
 
 .cal-today-badge {
     display: inline-block;
-    background: #eef2ff;
-    color: #4f46e5;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    color: #7c3aed;
     border-radius: 20px;
-    padding: 4px 14px;
+    padding: 5px 16px;
     font-size: 0.82rem;
     font-weight: 600;
+    border: 1px solid #c4b5fd;
 }
 
 .cal-new-btn {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
-    background: var(--primary-color, #007bff);
+    padding: 9px 18px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
     color: #fff;
     border: none;
-    border-radius: 20px;
+    border-radius: 24px;
     cursor: pointer;
     font-size: 0.88rem;
     font-weight: 600;
-    transition: opacity 0.2s, transform 0.1s;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.25);
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
 }
 
-.cal-new-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.cal-new-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(124,58,237,0.45);
+}
 
 .cal-icon-btn {
-    background: none;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e0e7ff);
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    color: var(--text-color, #4a5568);
-    transition: background 0.15s;
+    width: 34px;
+    height: 34px;
+    color: var(--text-muted, #6b7280);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.cal-icon-btn:hover { background: var(--hover-background-color, #f1f5f9); }
+.cal-icon-btn:hover {
+    background: var(--hover-background-color, #ede9fe);
+    border-color: #c4b5fd;
+    color: #7c3aed;
+}
 
 /* ── Calendar body ───────────────────────────────────────────────────────── */
 .cal-body {
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    padding: 12px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
 }
 
 .cal-body .rbc-calendar {
     flex: 1;
-    background: var(--sidebar-background-color, #fff);
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    background: var(--card-bg, #fff);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(124,58,237,0.08);
     overflow: hidden;
+    border: 1px solid var(--border-color, #e0e7ff);
 }
 
 /* React Big Calendar overrides */
 .cal-body .rbc-header {
-    background: var(--hover-background-color, #f8fafc);
-    font-size: 0.8rem;
+    background: var(--background-color, #f0f4ff);
+    font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #94a3b8;
-    padding: 8px 4px;
-    border-bottom: 1px solid #e8edf2 !important;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #6b7280);
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border-color, #e0e7ff) !important;
 }
 
 .cal-body .rbc-today {
-    background: rgba(99, 102, 241, 0.06) !important;
+    background: rgba(124,58,237,0.06) !important;
 }
 
 .cal-body .rbc-off-range-bg {
-    background: var(--background-color, #f7f9fc);
+    background: var(--background-color, #f0f4ff);
+    opacity: 0.5;
 }
 
 .cal-body .rbc-toolbar {
-    padding: 10px 14px;
+    padding: 12px 16px;
     margin-bottom: 0;
-    border-bottom: 1px solid #e8edf2;
+    border-bottom: 1px solid var(--border-color, #e0e7ff);
     flex-wrap: wrap;
     gap: 8px;
+    background: var(--card-bg, #fff);
 }
 
 .cal-body .rbc-toolbar button {
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    color: var(--text-color, #4a5568);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e0e7ff);
+    color: var(--text-color, #1e1b4b);
+    background: var(--card-bg, #fff);
     font-size: 0.82rem;
-    padding: 5px 12px;
-    transition: background 0.15s;
+    font-weight: 500;
+    padding: 6px 14px;
+    transition: all 0.15s ease;
+    cursor: pointer;
 }
 
 .cal-body .rbc-toolbar button:hover,
 .cal-body .rbc-toolbar button.rbc-active {
-    background: var(--primary-color, #007bff);
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
     color: #fff;
-    border-color: var(--primary-color, #007bff);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(124,58,237,0.3);
 }
 
 .cal-body .rbc-toolbar-label {
     font-weight: 700;
     font-size: 1rem;
-    color: var(--text-color, #1a202c);
+    color: var(--text-color, #1e1b4b);
 }
 
 .cal-body .rbc-event {
-    border-radius: 5px !important;
-    font-size: 0.8rem !important;
-    padding: 2px 6px !important;
+    border-radius: 6px !important;
+    font-size: 0.78rem !important;
+    padding: 3px 8px !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
+    transition: filter 0.15s, transform 0.1s;
+}
+
+.cal-body .rbc-event:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
 }
 
 .cal-body .rbc-agenda-view table.rbc-agenda-table {
@@ -164,21 +190,33 @@
 }
 
 .cal-body .rbc-show-more {
-    color: var(--primary-color, #007bff);
+    color: #7c3aed;
     font-weight: 600;
     font-size: 0.78rem;
+}
+
+.cal-body .rbc-date-cell {
+    font-size: 0.82rem;
+    color: var(--text-color, #1e1b4b);
+    font-weight: 500;
+}
+
+.cal-body .rbc-date-cell.rbc-now {
+    font-weight: 700;
+    color: #7c3aed;
 }
 
 /* ── Event detail popup ──────────────────────────────────────────────────── */
 .event-detail-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.35);
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    animation: overlayIn 0.18s ease-out;
+    animation: overlayIn 0.2s ease-out;
 }
 
 @keyframes overlayIn {
@@ -187,43 +225,43 @@
 }
 
 .event-detail-card {
-    background: var(--sidebar-background-color, #fff);
-    border-radius: 14px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-    width: 360px;
+    background: var(--card-bg, #fff);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(124,58,237,0.1);
+    width: 380px;
     max-width: 92vw;
     overflow: hidden;
-    animation: cardIn 0.2s ease-out;
+    animation: cardIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes cardIn {
-    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    from { opacity: 0; transform: scale(0.92) translateY(14px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .event-detail-color-strip {
-    height: 5px;
+    height: 6px;
 }
 
 .event-detail-content {
-    padding: 18px 20px 16px;
+    padding: 20px 22px 18px;
 }
 
 .event-detail-title {
-    margin: 0 0 14px;
-    font-size: 1.05rem;
+    margin: 0 0 16px;
+    font-size: 1.08rem;
     font-weight: 700;
-    color: var(--text-color, #1a202c);
+    color: var(--text-color, #1e1b4b);
     line-height: 1.4;
 }
 
 .event-detail-row {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 10px;
     font-size: 0.86rem;
     color: var(--text-color, #4a5568);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     line-height: 1.5;
 }
 
@@ -233,7 +271,7 @@
 }
 
 .event-detail-desc {
-    color: #64748b;
+    color: var(--text-muted, #6b7280);
     font-size: 0.84rem;
     line-height: 1.5;
     white-space: pre-wrap;
@@ -242,49 +280,50 @@
 .event-detail-actions {
     display: flex;
     gap: 8px;
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(0,0,0,0.07);
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color, #e0e7ff);
 }
 
 .event-detail-edit-btn {
-    padding: 7px 14px;
-    background: var(--primary-color, #007bff);
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.84rem;
     font-weight: 600;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(124,58,237,0.3);
 }
 
-.event-detail-edit-btn:hover { opacity: 0.85; }
+.event-detail-edit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
 .event-detail-delete-btn {
-    padding: 7px 14px;
+    padding: 8px 16px;
     background: none;
     border: 1px solid #fca5a5;
     color: #dc2626;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.84rem;
     font-weight: 600;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.1s;
 }
 
-.event-detail-delete-btn:hover { background: #fef2f2; }
+.event-detail-delete-btn:hover { background: #fef2f2; transform: translateY(-1px); }
 
 .event-detail-close-btn {
     margin-left: auto;
-    padding: 7px 14px;
+    padding: 8px 16px;
     background: none;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
+    border: 1px solid var(--border-color, #e0e7ff);
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.84rem;
-    color: #64748b;
+    color: var(--text-muted, #6b7280);
     transition: background 0.15s;
 }
 
-.event-detail-close-btn:hover { background: #f1f5f9; }
+.event-detail-close-btn:hover { background: var(--hover-background-color, #ede9fe); }

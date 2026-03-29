@@ -47,6 +47,7 @@ const translations: Record<Language, Record<string, string>> = {
         'mail.downloadImages': 'Download remote images',
         'mail.imagesBlocked': 'Remote images are blocked.',
         'mail.loadImages': 'Load images',
+        'mail.details': 'Details',
         'mail.conversation': 'conversation',
         'mail.messages': 'messages',
 
@@ -153,6 +154,7 @@ const translations: Record<Language, Record<string, string>> = {
         'mail.downloadImages': 'Scarica immagini remote',
         'mail.imagesBlocked': 'Le immagini remote sono bloccate.',
         'mail.loadImages': 'Carica immagini',
+        'mail.details': 'Dettagli',
         'mail.conversation': 'conversazione',
         'mail.messages': 'messaggi',
 
@@ -254,6 +256,7 @@ const translations: Record<Language, Record<string, string>> = {
         'mail.downloadImages': 'Remote-Bilder laden',
         'mail.imagesBlocked': 'Remote-Bilder sind blockiert.',
         'mail.loadImages': 'Bilder laden',
+        'mail.details': 'Details',
         'mail.conversation': 'Unterhaltung',
         'mail.messages': 'Nachrichten',
 

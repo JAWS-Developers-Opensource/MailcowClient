@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electron', {
   saveUserCredentials: (userCredentials) => ipcSend('saveUserCredentials', userCredentials),
   getUserCredentials: () => ipcInvoke('getUserCredentials'),
   removeUserCredentials: () => ipcInvoke('removeUserCredentials'),
+  autoLogin: () => ipcInvoke('autoLogin'),
   // OAuth2
   checkOAuth2Available: (host) => ipcInvoke('checkOAuth2Available', { host }),
   startOAuth2Login: (host, clientId, clientSecret) => ipcInvoke('startOAuth2Login', { host, clientId, clientSecret }),
@@ -29,6 +30,10 @@ contextBridge.exposeInMainWorld('electron', {
   calUpdateEvent: (params) => ipcInvoke('calUpdateEvent', params),
   calDeleteEvent: (calendarObject) => ipcInvoke('calDeleteEvent', { calendarObject }),
   calCreateCalendar: (params) => ipcInvoke('calCreateCalendar', params),
+  calGetAllAccountCalendars: () => ipcInvoke('calGetAllAccountCalendars'),
+  calQueryCalendarForAccount: (accountEmail, accountHost, calendar, month, year) => ipcInvoke('calQueryCalendarForAccount', { accountEmail, accountHost, calendar, month, year }),
+  calCreateEventForAccount: (params) => ipcInvoke('calCreateEventForAccount', params),
+  calCreateCalendarForAccount: (params) => ipcInvoke('calCreateCalendarForAccount', params),
   // CardDAV
   cardCreateConn: () => ipcInvoke('cardCreateConn'),
   cardFetchAddressBooks: () => ipcInvoke('cardFetchAddressBooks'),

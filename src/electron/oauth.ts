@@ -201,6 +201,9 @@ export async function startOAuth2Login(params: {
             webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
+                webSecurity: true,
+                allowRunningInsecureContent: false,
+                sandbox: true,
             },
             title: 'Mailcow – Login',
             autoHideMenuBar: true,

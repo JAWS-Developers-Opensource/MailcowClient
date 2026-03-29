@@ -163,6 +163,10 @@ const MailPage: React.FC = () => {
     const [accountEmail, setAccountEmail]         = useState('');
     const [accountHost, setAccountHost]           = useState('');
 
+    // Multi-account switcher
+    const [accounts, setAccounts]                 = useState<{ email: string; host: string; label?: string }[]>([]);
+    const [switchingAccount, setSwitchingAccount] = useState(false);
+
     const folderTree = useMemo(() => buildFolderTree(folders), [folders]);
     const conversations = useMemo(() => groupIntoConversations(emails), [emails]);
 
@@ -267,6 +271,29 @@ const MailPage: React.FC = () => {
         UILogger.info('MailPage', `Switched to folder: ${folder}`);
     };
 
+    // ── Account switch ────────────────────────────────────────────────────────
+    const handleSwitchAccount = async (acc: { email: string; host: string }) => {
+        if (acc.email === accountEmail) return;
+        setSwitchingAccount(true);
+        try {
+            await window.electron.switchAccount(acc);
+            const creds = await window.electron.getUserCredentials();
+            setAccountEmail(creds.email);
+            setAccountHost(creds.host);
+            setSelectedFolder('INBOX');
+            setPage(0);
+            setEmails([]);
+            setSelectedEmailBody(null);
+            setSelectedUid(undefined);
+            await loadFolders();
+            await loadEmails('INBOX', 0, true);
+            addNotification('Mail', `Switched to ${acc.email}`, 'success');
+        } catch (e: any) {
+            addNotification('Mail', `Switch failed: ${e.message}`, 'error');
+        }
+        setSwitchingAccount(false);
+    };
+
     // ── Infinite scroll ───────────────────────────────────────────────────────
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const el = e.currentTarget;
@@ -287,6 +314,7 @@ const MailPage: React.FC = () => {
             setAccountEmail('');
             setAccountHost('');
         });
+        window.electron.getAccounts().then(setAccounts).catch(() => {});
     }, []);
 
     const handleRefresh = () => {
@@ -298,6 +326,27 @@ const MailPage: React.FC = () => {
         <div className="mail-page">
             {/* ── Folder sidebar ─────────────────────────────────── */}
             <div className="mail-folders">
+                {/* Account switcher */}
+                {accounts.length > 1 && (
+                    <div className="mail-account-switcher">
+                        {accounts.map((acc) => (
+                            <button
+                                key={acc.email}
+                                className={`mail-account-tab${acc.email === accountEmail ? ' mail-account-tab--active' : ''}`}
+                                onClick={() => handleSwitchAccount(acc)}
+                                disabled={switchingAccount}
+                                title={acc.host}
+                            >
+                                <span className="mail-account-avatar">
+                                    {acc.email[0].toUpperCase()}
+                                </span>
+                                <span className="mail-account-label">
+                                    {acc.label ?? acc.email.split('@')[1] ?? acc.email}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                )}
                 <div className="mail-compose-area">
                     <button className="compose-btn" onClick={() => setShowCompose(true)}>
                         <FiEdit size={13} /> {t('mail.compose')}

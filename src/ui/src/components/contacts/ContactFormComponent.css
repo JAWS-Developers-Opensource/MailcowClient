@@ -11,8 +11,11 @@
 .contact-form-modal {
     background: var(--sidebar-background-color, #fff);
     border-radius: 10px;
-    width: 440px;
+    width: 480px;
     max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     overflow: hidden;
 }
@@ -42,6 +45,8 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .contact-form-row {
