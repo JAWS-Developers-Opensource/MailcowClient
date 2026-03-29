@@ -5,7 +5,7 @@ import ComposeEmailComponent from './ComposeEmailComponent';
 import { useLanguage } from '../../contexts/LanguageContext';
 import {
     FiCornerUpLeft, FiCornerUpRight, FiTrash2,
-    FiMoreHorizontal, FiEyeOff, FiFolderPlus, FiDownload,
+    FiMoreHorizontal, FiEyeOff, FiFolderPlus, FiDownload, FiInfo,
 } from 'react-icons/fi';
 import UILogger from '../../helpers/UILogger';
 import { getAvatarColor, parseSenderName } from './EmailItemComponent';
@@ -42,6 +42,7 @@ const SelectedEmailComponent: React.FC<Props> = ({
     const [showMore, setShowMore]         = useState(false);
     const [showMoveMenu, setShowMoveMenu] = useState(false);
     const [imagesAllowed, setImagesAllowed] = useState(false);
+    const [showRawHeaders, setShowRawHeaders] = useState(false);
 
     const replySubject = email.subject?.startsWith('Re:')  ? email.subject : `Re: ${email.subject ?? ''}`;
     const fwdSubject   = email.subject?.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject ?? ''}`;
@@ -109,6 +110,11 @@ const SelectedEmailComponent: React.FC<Props> = ({
         onMarkUnread?.();
     };
 
+    const handleToggleDetails = () => {
+        setShowRawHeaders((prev) => !prev);
+        setShowMore(false);
+    };
+
     const senderName = parseSenderName(email.from ?? '');
     const avatarLetter = senderName.charAt(0).toUpperCase();
     const avatarColor = getAvatarColor(email.from ?? '');
@@ -169,6 +175,11 @@ const SelectedEmailComponent: React.FC<Props> = ({
                                             <FiEyeOff size={13} /> {t('mail.markUnread')}
                                         </button>
                                     )}
+                                    {email.rawHeaders && (
+                                        <button className="email-more-item" onClick={handleToggleDetails}>
+                                            <FiInfo size={13} /> {t('mail.details')}
+                                        </button>
+                                    )}
                                     {onMove && folders.length > 0 && (
                                         <div
                                             className="email-more-item email-more-item--submenu"
@@ -199,6 +210,21 @@ const SelectedEmailComponent: React.FC<Props> = ({
 
                 <div className="selected-email-divider" />
             </div>
+
+            {/* ── Raw headers panel (shown when Details is toggled) ──── */}
+            {showRawHeaders && email.rawHeaders && (
+                <div className="raw-headers-panel">
+                    <div className="raw-headers-toolbar">
+                        <span className="raw-headers-title">Raw Headers</span>
+                        <button
+                            className="raw-headers-close"
+                            onClick={() => setShowRawHeaders(false)}
+                            aria-label="Close details"
+                        >✕</button>
+                    </div>
+                    <pre className="raw-headers-pre">{email.rawHeaders}</pre>
+                </div>
+            )}
 
             {/* ── Remote images notice ───────────────────────────── */}
             {hasRemoteImages && !imagesAllowed && (

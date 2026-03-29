@@ -17,5 +17,6 @@ export type ImapEmailBody = {
     date?: string;
     bodyText?: string;
     bodyHtml?: string;
+    rawHeaders?: string;
     error?: string;
 };
