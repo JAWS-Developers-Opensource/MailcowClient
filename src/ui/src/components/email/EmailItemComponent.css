@@ -1,11 +1,11 @@
 .email-item {
     display: flex;
     align-items: center;
-    gap: 0;
-    padding: 8px 12px 8px 16px;
+    gap: 10px;
+    padding: 10px 12px 10px 14px;
     cursor: pointer;
     position: relative;
-    border-left: 2px solid transparent;
+    border-left: 3px solid transparent;
     border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.05));
     transition: background 0.12s;
 }
@@ -15,8 +15,23 @@
 }
 
 .email-item--selected {
-    background: var(--card-bg, #f5f3ff) !important;
+    background: var(--hover-background-color, #ede9fe) !important;
     border-left-color: var(--primary-color, #7c3aed);
+}
+
+/* ── Avatar circle ──────────────────────────────────────────────────────────── */
+.email-item-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    user-select: none;
 }
 
 /* ── Text body ─────────────────────────────────────────────────────────────── */
@@ -25,7 +40,7 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
 }
 
 .email-item-row1 {
@@ -77,7 +92,7 @@
 
 .email-item-subject {
     font-size: 0.82rem;
-    color: #64748b;
+    color: var(--text-muted, #64748b);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

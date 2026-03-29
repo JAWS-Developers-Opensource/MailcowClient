@@ -29,6 +29,17 @@ export async function checkForUpdates(): Promise<UpdateInfo> {
     });
 
     if (!response.ok) {
+        // 404 means no releases have been published yet — treat as "up to date"
+        if (response.status === 404) {
+            return {
+                updateAvailable: false,
+                currentVersion,
+                latestVersion: currentVersion,
+                releaseUrl: `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases`,
+                releaseName: '',
+                releaseNotes: '',
+            };
+        }
         throw new Error(`GitHub API responded with ${response.status}`);
     }
 
