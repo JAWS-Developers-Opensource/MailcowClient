@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import EmailList from '../../components/email/EmailListComponent';
 import SelectedEmail from '../../components/email/SelectedEmailComponent';
 import ComposeEmailComponent from '../../components/email/ComposeEmailComponent';
 import './MailPage.css';
