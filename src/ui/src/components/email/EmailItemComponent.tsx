@@ -52,7 +52,15 @@ const EmailItemComponent = ({
     return (
         <div
             className={`email-item${selected ? ' email-item--selected' : ''}${isUnread ? ' email-item--unread' : ''}`}
+            role="button"
+            tabIndex={0}
             onClick={onSelect}
+            onKeyDown={(event) => {
+                if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                    event.preventDefault();
+                    onSelect();
+                }
+            }}
         >
             <div className="email-item-avatar" style={{ background: avatarColor }}>
                 {avatarLetter}
@@ -72,7 +80,6 @@ const EmailItemComponent = ({
             <button
                 className="email-item-delete"
                 onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                tabIndex={-1}
                 aria-label="Delete"
             >
                 <FaRegTrashAlt />

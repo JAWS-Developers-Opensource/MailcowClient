@@ -8,7 +8,7 @@
 
 /* ── Top section ─────────────────────────────────────────────────────────── */
 .selected-email-top {
-    padding: 16px 20px 0;
+    padding: 20px 24px 0;
     flex-shrink: 0;
 }
 
@@ -47,7 +47,7 @@
 /* ── Subject ─────────────────────────────────────────────────────────────── */
 .selected-email-subject {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--text-color, #1a202c);
     line-height: 1.35;
@@ -163,7 +163,7 @@
 .selected-email-divider {
     height: 1px;
     background: var(--border-color, rgba(0,0,0,0.08));
-    margin: 0 -20px;
+    margin: 0 -24px;
 }
 
 /* ── Raw headers panel ───────────────────────────────────────────────────── */
@@ -282,4 +282,3 @@
     line-height: 1.7;
     padding: 20px;
 }
-

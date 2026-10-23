@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import EmailList from '../../components/email/EmailListComponent';
 import SelectedEmail from '../../components/email/SelectedEmailComponent';
 import ComposeEmailComponent from '../../components/email/ComposeEmailComponent';
 import './MailPage.css';
@@ -78,7 +77,8 @@ function normaliseSubject(s: string): string {
 function groupIntoConversations(emails: ImapEmail[]): Conversation[] {
     const map = new Map<string, Conversation>();
     for (const email of emails) {
-        const key = normaliseSubject(email.subject ?? '');
+        const subjectKey = normaliseSubject(email.subject ?? '');
+        const key = subjectKey || `message:${email.uid}`;
         if (!map.has(key)) {
             map.set(key, {
                 id: key,
@@ -120,8 +120,17 @@ const FolderTree: React.FC<{
                     <li key={node.name}>
                         <div
                             className={`folder-item${isSelected ? ' folder-item--active' : ''}`}
+                            role="button"
+                            tabIndex={0}
+                            aria-current={isSelected ? 'page' : undefined}
                             style={{ paddingLeft: depth * 6 + 8 }}
                             onClick={() => onSelect(node.name)}
+                            onKeyDown={(event) => {
+                                if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                                    event.preventDefault();
+                                    onSelect(node.name);
+                                }
+                            }}
                         >
                             {hasChildren ? (
                                 <span className="folder-expand-btn" onClick={(e) => {
@@ -450,6 +459,8 @@ const ConversationList: React.FC<{
                         {/* Conversation header */}
                         <div
                             className={`email-item${isSelected ? ' email-item--selected' : ''}${isUnread ? ' email-item--unread' : ''}`}
+                            role="button"
+                            tabIndex={0}
                             onClick={() => {
                                 if (isSingle) {
                                     onSelectEmail(conv.latest);
@@ -460,6 +471,21 @@ const ConversationList: React.FC<{
                                         else next.add(conv.id);
                                         return next;
                                     });
+                                }
+                            }}
+                            onKeyDown={(event) => {
+                                if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                                    event.preventDefault();
+                                    if (isSingle) {
+                                        onSelectEmail(conv.latest);
+                                    } else {
+                                        setExpandedConv((prev) => {
+                                            const next = new Set(prev);
+                                            if (next.has(conv.id)) next.delete(conv.id);
+                                            else next.add(conv.id);
+                                            return next;
+                                        });
+                                    }
                                 }
                             }}
                         >
@@ -483,9 +509,13 @@ const ConversationList: React.FC<{
                                 </div>
                             </div>
                             <div className="email-actions">
-                                <div className="action-delete" onClick={(e) => { e.stopPropagation(); onDeleteEmail(conv.latest); }}>
+                                <button
+                                    className="action-delete"
+                                    aria-label={t('mail.delete')}
+                                    onClick={(e) => { e.stopPropagation(); onDeleteEmail(conv.latest); }}
+                                >
                                     🗑
-                                </div>
+                                </button>
                             </div>
                         </div>
 
@@ -494,7 +524,15 @@ const ConversationList: React.FC<{
                             <div
                                 key={msg.uid}
                                 className={`email-item email-item--nested${msg.uid === selectedUid ? ' email-item--selected' : ''}${!msg.flags.includes('\\Seen') ? ' email-item--unread' : ''}`}
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => onSelectEmail(msg)}
+                                onKeyDown={(event) => {
+                                    if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                                        event.preventDefault();
+                                        onSelectEmail(msg);
+                                    }
+                                }}
                             >
                                 <div className="email-content">
                                     <div className="email-header">
