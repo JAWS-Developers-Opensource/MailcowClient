@@ -5,12 +5,12 @@
     left: 0;
     height: 100vh;
     width: 72px;
-    background: linear-gradient(180deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    background: linear-gradient(180deg, #101c2b 0%, #172b40 55%, #132338 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 10px 0 12px;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 2px 0 16px rgba(12, 26, 43, 0.16);
     z-index: 100;
     transition: width 0.2s ease;
     border-right: 1px solid rgba(255,255,255,0.04);
@@ -26,7 +26,7 @@
     font-size: 1.7rem;
     display: block;
     line-height: 1;
-    filter: drop-shadow(0 0 8px rgba(124,58,237,0.6));
+    filter: drop-shadow(0 2px 8px rgba(244,123,32,0.32));
 }
 
 /* ── Nav items ───────────────────────────────────────────────────────────── */
@@ -87,13 +87,13 @@
 }
 
 .sidebar-nav-item--active {
-    background: linear-gradient(135deg, rgba(124,58,237,0.8), rgba(109,40,217,0.6));
+    background: linear-gradient(135deg, rgba(244,123,32,0.96), rgba(223,104,16,0.88));
     color: #fff !important;
-    box-shadow: 0 4px 16px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 4px 14px rgba(244,123,32,0.24), inset 0 1px 0 rgba(255,255,255,0.18);
 }
 
 .sidebar-nav-item--active:hover {
-    background: linear-gradient(135deg, rgba(124,58,237,0.9), rgba(109,40,217,0.7));
+    background: linear-gradient(135deg, #fb8b36, #e8741b);
     transform: translateY(-1px);
 }
 
@@ -175,7 +175,7 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    background: linear-gradient(135deg, #f47b20, #d95d0b);
     color: #fff;
     font-size: 0.88rem;
     font-weight: 700;
@@ -183,7 +183,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.15), 0 4px 12px rgba(124,58,237,0.4);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.15), 0 4px 12px rgba(244,123,32,0.25);
     transition: box-shadow 0.2s, transform 0.15s;
 }
 
@@ -251,7 +251,7 @@
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    background: linear-gradient(135deg, #f47b20, #d95d0b);
     color: #fff;
     font-size: 0.78rem;
     font-weight: 700;
@@ -309,4 +309,3 @@
 }
 
 .sidebar-account-logout:hover { background: #fef2f2; }
-
